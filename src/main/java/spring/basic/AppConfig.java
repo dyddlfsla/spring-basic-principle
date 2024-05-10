@@ -1,6 +1,9 @@
 package spring.basic;
 
+import spring.basic.discount.DiscountPolicy;
+import spring.basic.discount.FixDiscountPolicy;
 import spring.basic.discount.RateDiscountPolicy;
+import spring.basic.member.MemberRepository;
 import spring.basic.member.MemberService;
 import spring.basic.member.MemberServiceImpl;
 import spring.basic.member.MemoryMemberRepository;
@@ -15,13 +18,23 @@ import spring.basic.order.OrderServiceImpl;
 *
 * */
 public class AppConfig {
-
+  
   public MemberService memberService() { //생성자를 통해 의존성을 주입한다고 해서, 생성자 주입이라고도 한다.
-    return new MemberServiceImpl(new MemoryMemberRepository());
+    return new MemberServiceImpl(memberRepository());
   }
 
   public OrderService orderService() {
-    return new OrderServiceImpl(new RateDiscountPolicy(), new MemoryMemberRepository());
+    return new OrderServiceImpl(discountPolicy(), memberRepository());
   }
+
+  private MemberRepository memberRepository() {
+    return new MemoryMemberRepository();
+  }
+
+  private DiscountPolicy discountPolicy() {
+//    return new RateDiscountPolicy();
+    return new FixDiscountPolicy();
+  }
+
 
 }
