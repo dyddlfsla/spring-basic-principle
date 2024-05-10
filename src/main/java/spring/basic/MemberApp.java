@@ -8,15 +8,20 @@ import spring.basic.member.MemberServiceImpl;
 public class MemberApp {
 
   public static void main(String[] args) {
-    MemberService memberService = new MemberServiceImpl();
+
+    AppConfig appConfig = new AppConfig();
+
+    MemberService memberService = appConfig.memberService();
     Member member = new Member(1L, "memberA", Grade.VIP);
     memberService.join(member);
 
     Member foundMember = memberService.findMember(1L);
 
     System.out.printf("new member's name: %s, foundMember's name: %s\n", member.getName(), foundMember.getName());
-    //self-taught
-    // System.out.print 를 통해 직접 '눈'으로 확인하는 테스트는 결코 좋은 테스트가 아니다. 좋은 테스트를 작성하는 것이 개발의 기본이다.
+    /*
+   self-taught
+    * System.out.print 를 통해 직접 '눈'으로 확인하는 테스트는 결코 좋은 테스트가 아니다. 좋은 테스트를 작성하는 것이 개발의 기본이다.
+     */
 
     /*
    self-taught
