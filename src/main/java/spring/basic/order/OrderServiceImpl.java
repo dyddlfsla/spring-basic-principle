@@ -57,7 +57,6 @@ public class OrderServiceImpl implements OrderService {
   *
   * */
 
-
   public OrderServiceImpl(DiscountPolicy discountPolicy, MemberRepository memberRepository) {
     this.discountPolicy = discountPolicy;
     this.memberRepository = memberRepository;
