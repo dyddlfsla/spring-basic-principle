@@ -1,8 +1,9 @@
 package spring.basic;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import spring.basic.discount.DiscountPolicy;
 import spring.basic.discount.FixDiscountPolicy;
-import spring.basic.discount.RateDiscountPolicy;
 import spring.basic.member.MemberRepository;
 import spring.basic.member.MemberService;
 import spring.basic.member.MemberServiceImpl;
@@ -17,21 +18,26 @@ import spring.basic.order.OrderServiceImpl;
 * 연결해주는 별도의 설정 클래스를 만들자.
 *
 * */
+@Configuration
 public class AppConfig {
-  
+
+  @Bean(name = "memberService")
   public MemberService memberService() { //생성자를 통해 의존성을 주입한다고 해서, 생성자 주입이라고도 한다.
     return new MemberServiceImpl(memberRepository());
   }
 
+  @Bean
   public OrderService orderService() {
     return new OrderServiceImpl(discountPolicy(), memberRepository());
   }
 
-  private MemberRepository memberRepository() {
+  @Bean
+  public MemberRepository memberRepository() {
     return new MemoryMemberRepository();
   }
 
-  private DiscountPolicy discountPolicy() {
+  @Bean
+  public DiscountPolicy discountPolicy() {
 //    return new RateDiscountPolicy();
     return new FixDiscountPolicy();
   }

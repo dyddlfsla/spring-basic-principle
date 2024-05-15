@@ -1,17 +1,21 @@
 package spring.basic;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import spring.basic.member.Grade;
 import spring.basic.member.Member;
 import spring.basic.member.MemberService;
-import spring.basic.member.MemberServiceImpl;
 
 public class MemberApp {
 
   public static void main(String[] args) {
 
-    AppConfig appConfig = new AppConfig();
+//    AppConfig appConfig = new AppConfig();
+//    MemberService memberService = appConfig.memberService();
 
-    MemberService memberService = appConfig.memberService();
+    ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+    MemberService memberService = ac.getBean("memberService", MemberService.class);
+
     Member member = new Member(1L, "memberA", Grade.VIP);
     memberService.join(member);
 
