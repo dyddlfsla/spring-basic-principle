@@ -132,8 +132,24 @@ public class ChapterSix {
   *
   * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
+  * Ⅵ. 스프링 bean 조회 - 상속 관계
   *
+  * - 스프링 bean 을 조회할 때, 부모 타입을 사용하면 자식 타입에 해당하는 bean 까지 모두 조회된다.
   *
+  * 예를 들어, RateDiscountPolicy 클래스와 FixDiscountPolicy 클래스가 DiscountPolicy 인터페이스를 구현하고 있는 경우,
+  * DiscountPolicy 타입의 스프링 bean 을 조회하면 RateDiscountPolicy 객체와 FixDiscountPolicy 객체 둘 다 같이 조회될 것이고
+  * 어떤 bean 을 반환해야 할지, 특정할 수 없으므로 예외가 발생한다.
+  *
+  * DiscountPolicy discountPolicy = ac.getBean(DiscountPolicy.class); // 2개 이상의 bean 이 검색되고, 예외가 발생.
+  *
+  * 위에서 배운 것처럼, bean 을 특정할 수 있도록 이름도 매개 변수로 추가해주면 된다.
+  *
+  * DiscountPolicy discountPolicy = ac.getBean("rateDiscountPolicy", DiscountPolicy.class);
+  *
+  * ◆ Object 타입으로 스프링 bean 조회하기.
+  * 자바의 모든 클래스는 Object 클래스의 하위 클래스이다.
+  * Object 타입으로 스프링 bean 을 조회하면 어떻게 될까?
+  * => 사용자가 정의한 스프링 bean 을 포함한 스프링 컨테이너에 담긴 모든 bean 객체가 조회된다.
   *
   *
   * */
