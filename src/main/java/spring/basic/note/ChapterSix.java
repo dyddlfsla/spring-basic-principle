@@ -31,6 +31,7 @@ public class ChapterSix {
   * ※ 스프링 컨테이너를 말할 때, BeanFactory 와 ApplicationContext 를 구분해서 이야기한다.
   * 그러나 BeanFactory 를 직접 사용하는 경우는 거의 없으므로, 일반적으로 ApplicationContext 를 스프링 컨테이너라고 한다.
   *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
   * Ⅱ. Spring Container 생성 과정.
   *
@@ -66,6 +67,72 @@ public class ChapterSix {
   *
   * ※ 원래 스프링은 Bean 을 생성하고, Bean 간의 의존 관계를 주입하는 단계가 나누어져 있다.
   *   그런데 이렇게 자바 코드로 스프링 Bean 을 등록하면, 생성자를 호출하면서 동시에 의존관계 주입까지 한번에 처리된다.
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅲ. 스프링 컨테이너에 등록된 모든 Bean 조회.
+  *
+  * AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+  *
+  * void findAllBeans() {
+  *   String[] beanDefinitionNames = ac.getBeanDefinitionNames();
+  *
+  *   for (String beanDefinitionName : beanDefinitionNames) {
+  *   Object bean = ac.getBean(beanDefinitionName);
+  *   System.out.printf("name = %s , object = %s%n", beanDefinitionName, bean);
+  *   }
+  * }
+  *
+  * getBeanDefinitionNames(): 스프링 컨테이너에 등록된 모든 Bean 의 이름을 String[] 형태로 반환한다.
+  * getBean(String name): name 으로 Bean 객체를 찾아 반환한다.
+  *
+  * -스프링 Bean 은 Role(역할)을 가지고 있는데,
+  * ROLE_APPLICATION: 일반적으로 사용자가 정의한 Bean
+  * ROLE_INFRASTRUCTURE: 스프링 프레임워크가 내부적으로 사용하기 위해 만든 Bean
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅳ. 스프링 Bean 조회 - 기본
+  *
+  * AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+  *
+  * ◆ Bean 이름으로 찾기
+  * -getBean(String name, Class<T> requiredType) 를 호출하면, 이름이 일치하는 Bean 객체를 반환한다.
+  *
+  * ◆ Bean 타입으로 찾기
+  * -getBean(Class<T> requiredType) 을 호출하면, 타입과 일치하는 Bean 객체를 반환한다.
+  *
+  * ◆ Bean 이름으로 찾기 실패한 경우
+  * Bean 을 찾지 못했다는 예외가 발생한다.
+  * -NoSuchBeanDefinitionException: No bean named 'XXX' available
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅴ. 스프링 Bean 조회 - 동일한 타입의 bean 이 2개 이상인 경우
+  *
+  * void findBeanByTypeOnDuplicate() {
+  *   assertThrows(NoUniqueBeanDefinitionException.class,
+  *     () -> ac.getBean(MemberRepository.class));
+  * }
+  *
+  * getBean(Class<T> requiredType) 을 호출하여 타입 으로 스프링 bean 을 조회 시,
+  * 같은 타입 의 스프링 bean 이 2개 이상 있다면 다음과 같은 예외가 발생한다.
+  * NoUniqueBeanDefinitionException: No qualifying bean of type 'spring.basic.member.MemberRepository' available:
+  * 메소드가 어떤 스프링 bean 을 반환해야 할지 특정할 수 없으므로 발생하는 예외이다.
+  *
+  * 이렇게 같은 타입의 bean 이 2개 이상 있는 경우에는, 한 개의 bean 만 특정할 수 있도록 bean 의 이름까지 넣어주는게 좋다.
+  * getBean(String name, Class<T> requiredType)
+  *
+  * ◆ 특정 타입의 Bean 을 모두 검색하기.
+  *
+  * Map<String, MemberRepository> foundBeans = ac.getBeansOfType(MemberRepository.class);
+  *
+  * getBeansOfType(@Nullable Class<T> type) 메소드를 사용하면,
+  * 해당 타입에 맞는 모든 Bean 들이 담겨 있는 Map 컬렉션을 얻을 수 있다.
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  *
   *
   *
   *
