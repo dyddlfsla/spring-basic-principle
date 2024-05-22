@@ -61,9 +61,10 @@ public class ChapterSix {
   * ③ 스프링 Bean 들간의 의존 관계 설정
   *   스프링 컨테이너는 스프링 Bean 간의 의존 관계를 파악하고 연결시켜 준다.
   *   @Bean
-  *   public OrderService orderService() { // OrderService 객체와 discountPolicy, memberRepository 객체를 연결시켜 주고 있다.
+  *   public OrderService orderService() {
   *     return new OrderServiceImpl(discountPolicy(), memberRepository());
   *   }
+  *   // OrderService 객체와 discountPolicy, memberRepository 객체를 연결시켜 주고 있다.
   *
   * ※ 원래 스프링은 Bean 을 생성하고, Bean 간의 의존 관계를 주입하는 단계가 나누어져 있다.
   *   그런데 이렇게 자바 코드로 스프링 Bean 을 등록하면, 생성자를 호출하면서 동시에 의존관계 주입까지 한번에 처리된다.
@@ -97,7 +98,7 @@ public class ChapterSix {
   * AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
   *
   * ◆ Bean 이름으로 찾기
-  * -getBean(String name, Class<T> requiredType) 를 호출하면, 이름이 일치하는 Bean 객체를 반환한다.
+  * -getBean(String name) 를 호출하면, 이름이 일치하는 Bean 객체를 반환한다.
   *
   * ◆ Bean 타입으로 찾기
   * -getBean(Class<T> requiredType) 을 호출하면, 타입과 일치하는 Bean 객체를 반환한다.
@@ -115,8 +116,8 @@ public class ChapterSix {
   *     () -> ac.getBean(MemberRepository.class));
   * }
   *
-  * getBean(Class<T> requiredType) 을 호출하여 타입 으로 스프링 bean 을 조회 시,
-  * 같은 타입 의 스프링 bean 이 2개 이상 있다면 다음과 같은 예외가 발생한다.
+  * getBean(Class<T> requiredType) 을 호출하여 타입으로 스프링 bean 을 조회 시,
+  * 같은 타입의 스프링 bean 이 2개 이상 있다면 다음과 같은 예외가 발생한다.
   * NoUniqueBeanDefinitionException: No qualifying bean of type 'spring.basic.member.MemberRepository' available:
   * 메소드가 어떤 스프링 bean 을 반환해야 할지 특정할 수 없으므로 발생하는 예외이다.
   *
