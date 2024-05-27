@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class ChapterThree {
+public class RoleOfAppConfig {
 
   /*
  self-taught
@@ -25,7 +25,7 @@ public class ChapterThree {
   * 부품 끼우듯 잘 했는데 뭐가 문제일까?
   * 클래스 간의 의존관계를 잘 살펴보자. OrderServiceImpl 클래스는 인터페이스 DiscountPolicy 에 의존하고 있을 뿐만 아니라,
   * 구현 클래스인 RateDiscountPolicy 클래스와 와 FixDiscountPolicy 클래스에도 의존하고 있는 것이다.
-  &
+  *
   * 따라서, 구현화에 의존하지 말고 추상화에만 의존하라는 DIP 를 위반한다.
   * 또한, 정책을 바꾸기 위해서는 new FixDiscountPolicy -> new RateDiscountPolicy 로 코드를 바꾸어야 하는데
   *      확장에는 열려 있고 변경에는 닫혀 있어야 한다는 OCP 도 위반하게 된다.

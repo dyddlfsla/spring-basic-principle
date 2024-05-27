@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class ChapterFive {
+public class ConvertToSpring {
 
   /*
  self-taught

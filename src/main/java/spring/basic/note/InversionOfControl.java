@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class ChapterFour {
+public class InversionOfControl {
 
   /*
  self-taught

@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class ChapterTwo {
+public class ObjectOrientedPrinciple {
 
   /*
   self-taught

@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class ChapterSix {
+public class SpringContainer {
 
   /*
  self-taught
