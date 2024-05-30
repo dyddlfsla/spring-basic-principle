@@ -1,12 +1,12 @@
 package spring.basic.note;
 
-public class SpringHistory {
+public class $1_SpringHistory {
 
   /*
   self-taught
    * Spring Basic Principle
    *
-   * chapter 01. Spring history
+   * Ⅰ. Spring history
    *
    * ◆ 자바 진영의 추운 겨울과 스프링의 탄생
    * 2000년대 초반 자바 진영의 표준 기술 EJB (Enterprise Java Beans) 이 있었다.
@@ -38,7 +38,7 @@ public class SpringHistory {
    *
    * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    *
-   * chapter02. What is Spring Framework?
+   * Ⅱ. What is Spring Framework?
    * 현재에서 와서 스프링이란 어떤 특정한 기술을 의미하는 것이 아니라 스프링을 기반으로 한 여러 가지 기술들을 모인 생태계라고 볼 수 있다.
    * ex) 스프링 프레임워크, 스프링 부트, 스프링 데이터, 스프링 세션, 스프링 배치, 스프링 클라우드 등등..
    *

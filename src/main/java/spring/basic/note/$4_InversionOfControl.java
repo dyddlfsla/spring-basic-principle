@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class InversionOfControl {
+public class $4_InversionOfControl {
 
   /*
  self-taught

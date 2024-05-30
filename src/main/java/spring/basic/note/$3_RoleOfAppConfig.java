@@ -1,9 +1,11 @@
 package spring.basic.note;
 
-public class RoleOfAppConfig {
+public class $3_RoleOfAppConfig {
 
   /*
  self-taught
+  *
+  * Ⅰ. 추상화, 구체화에 모두 의존하는 현재 상태.
   *
   * public class OrderServiceImpl implements OrderService {
   *
@@ -41,7 +43,7 @@ public class RoleOfAppConfig {
   *
   * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
-  * chapter.06 관심사의 분리
+  * Ⅱ. 관심사의 분리.
   *
   * 애플리케이션을 하나의 공연이라고 가정하자. 각각의 역할은 곧 인터페이스가 되고, 역할을 수행하는 배우는 구현 클래스가 된다.
   * 여기서 가장 중요한 문제.
@@ -58,6 +60,8 @@ public class RoleOfAppConfig {
   * 감독은 오로지 배우을 지정하는 일만 해주면 된다.
   *
   * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅲ. 공연기획자 만들기.
   *
   * ◆ AppConfig 클래스의 등장
   * 코드로 돌아가, 애플리케이션의 전체 동작 방식을 구성(config) 하기 위해, 구현 객체를 생성하고

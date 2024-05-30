@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class ConvertToSpring {
+public class $5_ConvertToSpring {
 
   /*
  self-taught
