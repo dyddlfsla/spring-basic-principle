@@ -21,8 +21,23 @@ public class $10_ApplicationAndSingleton {
   * MemberServiceImpl, OrderServiceImpl, MemoryMemberRepository, FixDiscountPolicy 객체를 만든다는 것이다.
   *
   * ▶ AppConfig appConfig = new AppConfig();
-  * ▶ MemberService memberService = appConfig.memberService();
-  * ▶ OrderService orderService = appConfig.orderService();
+  * ▶ MemberService memberService = appConfig.memberService(); //클라이언트가 회원가입을 요청하면 실행되는 코드.
+  * ▶ memberService.join();
+  * ▶ OrderService orderService = appConfig.orderService(); //클라이언트로가 상품 주문을 요청하면 실행되는 코드.
+  * ▶ orderService.createOrder();
+  *
+  * public MemberService memberService() {
+  *   return new MemberServiceImpl(memberRepository());
+  * }
+  * public OrderService orderService() {
+  *   return new OrderServiceImpl(discountPolicy(), memberRepository());
+  * }
+  * public MemberRepository memberRepository() {
+  *   return new MemoryMemberRepository();
+  * }
+  * public DiscountPolicy discountPolicy() {
+  *   return new FixDiscountPolicy();
+  * }
   *
   * 만약 100 대의 클라이언트가 주문 생성을 요청하면 한 객체당 x100 무려 400개의 객체가 만들어지는 셈이다.
   * 동일한 작업을 하는 객체를 중복해서 계속 생성하는 것은 비효율적인 메모리 낭비가 된다.
@@ -30,11 +45,6 @@ public class $10_ApplicationAndSingleton {
   *
   * 해결방안은 MemberServiceImpl, OrderServiceImpl, MemoryMemberRepository, FixDiscountPolicy 객체를
   * 딱 1개씩만 생성하고 모두가 객체를 공유하도록 하면 된다.
-  *
-  * ◆ 싱글톤 패턴 - Singleton pattern
-  *
-  * 싱글톤이란 디자인 패턴 중 하나로써, 클래스의 인스턴스가 딱 1개만 생성되는 것을 보장한다.
-  *
   *
   * */
 

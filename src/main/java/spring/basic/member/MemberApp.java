@@ -1,10 +1,8 @@
-package spring.basic;
+package spring.basic.member;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import spring.basic.member.Grade;
-import spring.basic.member.Member;
-import spring.basic.member.MemberService;
+import spring.basic.AppConfig;
 
 public class MemberApp {
 
