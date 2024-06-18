@@ -1,6 +1,7 @@
 package spring.basic;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import spring.basic.discount.DiscountPolicy;
 import spring.basic.discount.FixDiscountPolicy;
 import spring.basic.member.MemberRepository;
@@ -17,7 +18,7 @@ import spring.basic.order.OrderServiceImpl;
 * 연결해주는 별도의 설정 클래스를 만들자.
 *
 * */
-//@Configuration
+@Configuration
 public class AppConfig {
 
   @Bean(name = "memberService")

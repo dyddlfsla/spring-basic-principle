@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class $9_XmlAndBeanDefinition {
+public class $8_XmlAndBeanDefinition {
 
 
   /*

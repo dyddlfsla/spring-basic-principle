@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class $10_ApplicationAndSingleton {
+public class $9_ApplicationAndSingleton {
 
   /*
  self-taught
@@ -202,8 +202,8 @@ public class $10_ApplicationAndSingleton {
   *    return new MemoryMemberRepository();
   *  }
   *
-  * 스프링 컨테이너는 설정 정보 클래스의 내용을 읽고
-  * @Bean 이 붙은 메소드를 호출하고 반환된 객체들을 스프링 Bean 으로 등록한다.
+  * 스프링 컨테이너는 설정 정보 클래스의 내용을 읽은 뒤
+  * @Bean 이 붙은 메소드를 호출하여 반환된 객체들을 스프링 Bean 으로 등록한다.
   * 그런데 memberRepository() 메소드는 memberService() 와 orderService() 메소드가 호출될 때에도 같이 호출되는 상태이다.
   *
   * 결론적으로 스프링 컨테이너가 스프링 저장소를 구성할 때, new MemoryMemberRepository 는 총 3번 호출되는 것이다.
@@ -225,18 +225,20 @@ public class $10_ApplicationAndSingleton {
   *
   * 이상하다. 스프링 저장소가 구성되면서 new MemoryMemberRepository(); 가 3번 호출되어야 할텐데
   * 실제로는 new MemoryMemberRepository(); 가 한번만 호출되고 있는 것이다.
-  * 어떻게 이런 일이 일어나고 있는걸까?
+  * 어떻게 이런 일이 일어나는 걸까?
   *
   * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
   * Ⅵ. @Configuration 과 바이트코드 조작의 마법
   *
-  * 스프링 컨테이너는 싱글톤 레지스트리다. 즉 스프링 Bean 이 싱글톤이 되도록 무조건 보장해야 한다.
-  * 그런데, 스프링이 작성된 자바 코드를 어떻게 조작할 순 없으므로, 자바 코드에 따르면
+  * 스프링 컨테이너는 싱글톤 레지스트리다. 즉, 스프링 Bean 이 싱글톤이 되도록 무조건 보장해야 한다.
+  * 그런데 스프링이라고 하더라도 이미 작성된 자바 코드를 마음대로 바꿀 순 없으므로, 작성된 자바 코드대로
   * new MemoryMemberRepository(); 는 3번 호출되어야 하는 것이 맞다.
+  * 그러나 출력 메소드를 삽입하여 확인한 결과, new MemoryMemberRepository(); 는 한번만 호출되었다.
+  *
   * 스프링은 이 문제를 해결하기 위해서 클래스의 바이트코드를 변환하는 라이브러리(Code Generation Library, CGLIB) 를 사용한다.
   *
-  * 우선, 설정 정보를 담고 있는 AppConfig 도 하나의 Bean 으로 등록되는데, 이를 출력해보자.
+  * 우선, 설정 정보를 담고 있는 AppConfig 클래스도 하나의 Bean 으로 등록되는데, 이를 출력해보자.
   *
   * AppConfig bean = ac.getBean(AppConfig.class);
   * System.out.println("bean = " + bean);
@@ -244,15 +246,14 @@ public class $10_ApplicationAndSingleton {
   * ▶ bean = spring.basic.AppConfig$$SpringCGLIB$$0@63fbfaeb
   *
   * 원래 클래스의 toString() 을 호출하면, 클래스명@16진수해시코드가 출력되는데
-  * 클래스명에 $$SpringCGLIB$$ 이 붙어 있다. 이게 무엇일까?
+  * 클래스명이 AppConfig 로 끝나지 않고 뒤에 $$SpringCGLIB$$ 이 붙어 있다. 이게 무엇일까?
   *
   * 사실, 지금 스프링 컨테이너에는 우리가 작성한 AppConfig 가 등록되어 있는 것이 아니라,
   * AppConfig 를 상속하고 있는 AppConfig@CGLIB 클래스가 등록되어 있고,
   * 스프링 컨테이너는 이 AppConfig@CGLIB 의 내용을 가지고 스프링 Bean 을 만들고 있는 것이다.
   *
-  * 추측하건대, AppConfig@CGLIB 은 AppConfig 를 상속한 뒤,
-  * (AppConfig@CGLIB 가 자식 클래스이므로  Bean 타입 조회 시  대입될 수 있었다.)
-  * memberRepository() 메소드를 다음과 같이 오버라이딩한다.
+  * 추측하자면, AppConfig@CGLIB 은 AppConfig 를 상속한 뒤, (AppConfig@CGLIB 가 자식 클래스였기에  Bean 타입 조회 시 검색될 수 있었다.)
+  * memberRepository() 메소드를 다음과 같이 오버라이딩하고 있을 것이다.
   *
   * ※ AppConfig@CGLIB 의 예상 코드 (CGLIB 의 실제 코드는 훨씬 더 복잡하다.)
   * @Override
@@ -266,8 +267,8 @@ public class $10_ApplicationAndSingleton {
   *  ...
   * }
   *
-  * @Bean 이 붙은 메소드마다 이미 스프링 Bean 이 존재하면 존재하는 Bean 을 찾아서 반환하고,
-  * 해당 Bean 이 없다면 새로 만들어 등록 후, 반환하는 코드가 동적으로 만들어지게 된다.
+  * @Bean 이 붙은 메소드는 재정의되어서 이미 스프링 Bean 이 존재하는 경우, 존재하는 Bean 을 찾아서 반환하고,
+  * 해당 Bean 이 없다면 새로 만들어 등록 후, 반환하게 되는 것이다.
   * 그리고 이 덕분에 싱글톤이 가능한 것이다.
   *
   * ◆ 만약 @Configuration 을 적용하지 않고, @Bean 만 적용하면 어떻게 될까?

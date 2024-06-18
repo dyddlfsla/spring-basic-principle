@@ -1,5 +1,9 @@
 package spring.basic.member;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
 public class MemberServiceImpl implements MemberService {
 
 //private final MemberRepository memberRepository = new MemoryMemberRepository();
@@ -15,7 +19,7 @@ public class MemberServiceImpl implements MemberService {
   * 그래서 이것을 DI(Dependency Injection) 의존 관계 주입 또는 의존성 주입이라고 한다.
   *
   * */
-
+  @Autowired
   public MemberServiceImpl(MemberRepository memberRepository) {
     this.memberRepository = memberRepository;
   }

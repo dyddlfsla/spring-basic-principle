@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class $8_BeanFactory {
+public class $7_BeanFactory {
 
   /*
  self-taught

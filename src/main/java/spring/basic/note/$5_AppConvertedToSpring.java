@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class $5_ConvertToSpring {
+public class $5_AppConvertedToSpring {
 
   /*
  self-taught
@@ -11,6 +11,8 @@ public class $5_ConvertToSpring {
   *
   * ApplicationContext 를 스프링 컨테이너라고 한다.
   * 기존에는 개발자가 직접 AppConfig 클래스를 이용해서 객체를 생성하고 DI 를 했지만, 이제는 스프링 컨테이너를 통해서 한다.
+  * 스프링 컨테이너가 객체들을 생성하고 관리하며, 의존관계를 주입시켜주는 것이다.
+  * 즉, 스프링 컨테이너는 스프링 프레임워크에서의 DI 컨테이너인 것이다.
   *
   * 스프링 컨테이너는 @Configuration 이 붙은 클래스(AppConfig.class)를 설정 정보로 사용한다.
   * 또, 여기에서 @Bean 이 붙은 메서드를 모두 호출하고 반환된 객체를 스프링 컨테이너에 등록한다.

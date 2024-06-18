@@ -1,11 +1,16 @@
 package spring.basic.note;
 
-public class $3_RoleOfAppConfig {
+public class $3_MemberOrderApp {
 
   /*
  self-taught
   *
-  * Ⅰ. 추상화, 구체화에 모두 의존하는 현재 상태.
+  * Ⅰ. 회원상품주문 애플리케이션과 OOP.
+  *
+  * 자, 회원상품주문 애플리케이션을 만들어 보았다.
+  *
+  * 각 역할에 따라, 인터페이스를 분리하고 인터페이스의 구현체를 사용함으로써 추상화에 의존하도록 만들었다.
+  * 그렇다면 이 애플리케이션은 객체지향 설계 원칙을 충분히 따르고 있는걸까?
   *
   * public class OrderServiceImpl implements OrderService {
   *
