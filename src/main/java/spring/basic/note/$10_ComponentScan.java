@@ -104,8 +104,32 @@ public class $10_ComponentScan {
   *
   * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
+  * Ⅲ. @ComponentScan - Filter
   *
+  * @ComponentScan 은 includeFilters 와 excludeFilters 조건을 사용하여 특정 클래스를 컴포넌트 스캔 대상에서 포함/제외시킬 수 있다.
   *
+  * @ComponentScan(includeFilters = @Filter(type = FilterType.ANNOTATION, classes = MyIncludeComponent.class),
+  *               excludeFilters = @Filter(type = FilterType.ANNOTATION, classes = MyExcludeComponent.class))
+  *
+  * 위 코드는 @MyIncludeComponent 어노테이션이 붙은 클래스는 탐색 대상에 include(포함)시키고,
+  * @MyExcludeComponent 어노테이션이 붙은 클래스는 탐색 대상에서 exclude(제외)시킨다.
+  *
+  * 이때, FilterType 은 다음과 같이 열거형 상수로 지정된다.
+  *
+  * public enum FilterType {
+  *  ANNOTATION,             //특정 어노테이션이 붙은 대상을 조사하여 포함/제외시킨다.
+  *  ASSIGNABLE_TYPE,        //해당 타입과 자식 타입을 조사하여 포함/제외시킨다.
+  *  ASPECTJ,                //AspectJ 를 사용해서 포함/제외시킨다.
+  *  REGEX,                 //정규표현식을 사용해서 포함/제외시킨다.
+  *  CUSTOM;                //TypeFilter 를 직접 구현하여 포함/제외시킨다.
+  * }
+  *
+  * ※ 탐색 대상으로 포함시키는데 있어 @Component 면 충분하기 때문에, includeFilters 는 잘 사용되지 않는다.
+  *   excludeFilters 는 사용되기는 하나 역시 자주 사용되지는 않는다.
+  *   최근 스프링부트는 컴포넌트 스캔을 기본으로 제공하고 있는데, 여러 옵션을 건드려 사용하는 것 보다는
+  *   스프링이 제공하는 기본 설정 방식을 최대한 유지하는 것을 추천한다.
+  *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
   *
   * */
