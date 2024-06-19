@@ -131,6 +131,29 @@ public class $10_ComponentScan {
   *
   * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
+  * Ⅳ. @ComponentScan 을 통한 스프링 중복 등록과 충돌 문제.
+  *
+  * @ComponentScan 을 통해 Bean 을 등록할 때 만약 이름을 동일하게 하면 어떻게 될까?
+  *
+  * @Component("nameA")
+  * public class MemberServiceImpl {}
+  *
+  * @Component("nameA")
+  * public class OrderServiceImpl {}
+  *
+  * 위의 두 클래스는 자동으로 등록되는 Bean 인데 이름이 동일하다.
+  * 이렇게 자동 등록 Bean vs. 자동 등록 Bean 이 충돌하면 스프링은 ConflictingBeanDefinitionException 예외를 발생시킨다.
+  *
+  * 그러면 수동 등록 Bean 과 자동 등록 Bean 이 충돌하게 어떻게 될까?
+  * 이런 경우, SpringBoot 2.1 이전에는 수동으로 등록된 Bean 이 자동 등록된 Bean 을 오버라이딩(덮어씌우기)하도록 했다.
+  * 그러나 이제는 스프링부트가 BeanDefinitionOverrideException 예외를 발생시킨다.
+  *
+  * 사실, 이렇게 스프링 Bean 등록 방식을 통일하지 않은 것은 불안정한 작업 방식이다.
+  * 결국 프로그램은 여러 개발자들이 모여 코드를 작성하는데 누구는 수동으로 Bean 을 등록하고 있고,
+  * 누구는 자동으로 Bean 을 등록하면 이것이 쌓이고 쌓여 어느 시점에는 정말 잡기 힘든 버그가 된다.
+  * 스프링부트가 스프링 Bean 중복 시 오버라이딩을 허용하지 않고 예외를 발생시키도록 한것도 이러한 이유들 때문이다.
+  *
+  *
   *
   * */
 
