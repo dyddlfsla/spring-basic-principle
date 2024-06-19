@@ -11,8 +11,7 @@ public class $10_ComponentScan {
   * 지금까지는 @Configuration 클래스의 메소드에 @Bean 을 붙이거나, XML 파일의 <bean> 태그를 통해서
   * 스프링 Bean 을 등록했는데, 사실 이러한 방식은 잘 쓰이지 않는 방법이다.
   * 예제에서는 등록할 스프링 Bean 이 많지 않으므로 별 문제가 없었지만, 실무에서는 수 백개의 스프링 Bean 이 생성되는데,
-  * 이것들을 하나씩 @Bean 메소드로 등록하는 것은 그렇게 효율적이지 않기 때문이다.
-  * 또한,
+  * 이것들을 하나씩 @Bean 메소드로 등록하는 것은 그다지 효율적이지 않기 때문이다. 또한,
   *
   * @Bean
   * public OrderService orderService() {
@@ -22,6 +21,7 @@ public class $10_ComponentScan {
   * public MemberRepository memberRepository() {
   *   return new MemoryMemberRepository();
   * }
+  *
   * 위와 같은 코드는, 스프링 Bean 을 등록함과 동시에, 의존관계 주입도 이루어지기 때문에 좋은 코드라고 할 수 없다.
   *
   * 그래서 스프링 Bean 등록할 때 또 다른 방법인, @ComponentScan 방식을 사용할 수 있다.
@@ -61,6 +61,52 @@ public class $10_ComponentScan {
   * 2) 클래스 이름에서 첫 글자를 소문자로 바꾼 뒤 그것을 Bean 의 이름으로 사용한다. (AppConfig 에서는 @Bean 메소드의 이름이 Bean 이름이 되었다.)
   *    - 만약 Bean 이름을 따로 설정해야 한다면, @Component("memberServiceTwo") 와 같이 할수도 있다.
   * 3) @Autowired 를 사용하면 기본적으로 해당 타입과 맞는 Bean 이 있는지 검색한 후 의존관계를 주입시켜 준다.
+  *
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅱ. @ComponentScan 의 기본 탐색 위치와 대상
+  *
+  * @ComponentScan 을 통해 스프링 Bean 을 만들 때, 모든 자바 클래스를 다 확인하고 @Component 어노테이션이 붙어 있는지 확인하는 것은
+  * 시간이 오래 걸릴 뿐더러 비효율적이다. 그래서 @ComponentScan 을 사용할 때 부가적인 옵션을 추가하여 탐색 위치를 지정할 수 있다.
+  *
+  * ▶ @ComponentScan(basePackages = "spring.basic.member") //spring.basic.member 패키지부터 탐색을 시작한다.
+  *
+  * - basePackages: 탐색을 시작할 패키지 위치를 지정한다. 이 패키지를 포함하여 하위 패키지들 검색하여 @Component 가 붙은 클래스를 찾아낸다.
+  * - basePackages = { "spring.basic.member", "spring.basic.order"} 처럼 시작 위치를 2개 이상 지정할 수도 있다.
+  * - basePackageClasses: 해당 클래스가 속한 패키지를 탐색 시작 패키지로 지정한다.
+  * - basePackages 를 따로 지정하지 않으면, 어디부터 탐색을 할까?
+  *   - 지정하지 않으면 @ComponentScan 이 붙어 있는 설정 정보 클래스가 있는 패키지를 탐색 시작 패키지로 사용한다.
+  *
+  * ※ 권장하는 방법
+  * basePackages 를 사용하여 별도로 탐색 위치를 지정하지 말고, 그냥 @ComponentScan 이 붙은 설정 정보 클래스를
+  * 프로젝트의 최상단 root 에 위치시키는 것이다.
+  * 스프링부트에서도 이러한 방식을 기본으로 제공한다.
+  *
+  * 이 프로젝트의 경우, root 패키지가 spring.basic 이다. 그렇다면, spring.basic 패키지에 ComponentScanAppConfig 클래스를 위치시키고
+  * @ComponentScan 만 붙여주고 basePackages 조건은 생략한다.
+  *
+  * 이렇게 하면 spring.basic 패키지와 그 하위 패키지에 존재하는 클래스들이 모두 탐색 대상이 된다.
+  * 또한, 원래 설정 정보는 프로젝트를 대표하는 정보이므로 프로젝트의 root 위치에 두는 것이 좋다.
+  * 스프링부트를 사용한다면 설정 정보 클래스에 @ComponentScan 대신 @SpringBootApplication 을 붙이고 루트 위치에 놓으면 된다.
+  * (@SpringBootApplication 에 @ComponentScan 도 포함되어 있다.)
+  *  => 사실 자바의 어노테이션은 상속의 개념이 없다.
+  *    그럼에도 어느 어노테이션이 다른 애노테이션을 포함할 수 있는 것은 스프링이 제공하는 기술이다.
+  *
+  * ◆ @ComponentScan 의 탐색 대상
+  * @ComponentScan 은 @Component 가 붙은 클래스 뿐만 아니라 다음과 같은 어노테이션이 붙은 클래스도 탐색하고 그에 따른 부가 기능을 제공한다.
+  *
+  * 1) @Component: 컴포넌트 스캔에서 사용.
+  * 2) @Controller: 대상을 등록하고 Spring mvc 의 컨트롤러로 인식한다.
+  * 3) @Service: Service 의 경우, 추가적으로 해주는 기능은 없지만, 개발자에게 해당 클래스가 서비스 로직을 담당하고 있다는 것을 알려준다.
+  * 4) @Repository: 대상을 등록하고, 스프링 데이터 접근 계층에서 사용되는 것으로 인식
+  * 5) @Configuration: 스프링 설정 정보로 인식하고, 싱글톤이 유지되도록 작업한다.
+  *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  *
+  *
+  *
   *
   * */
 
