@@ -75,6 +75,41 @@ public class $11_SpringDependencyInjection {
   *   this.discountPolicy = discountPolicy;
   * }
   *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅱ. @Autowired 의 옵션 처리.
+  *
+  * @Autowired 를 사용할 때, 의존관계가 주입되지 않아도 동작해야 될 때가 있다.
+  * 그런데 @Autowired 는 `required` 옵션의 기본값이 `true` 이므로 의존관계 주입시 주입할 대상이 존재하지 않으면 예외가 발생한다.
+  *
+  * 이런 상황에서 다음과 같은 방법으로 @Autowired 에 옵션을 지정할 수 있다.
+  *
+  * 1) @Autowired(required = false)
+  *  의존관계 주입시, 주입할 대상이 존재하지 않으면 메소드 자체도 호출하지 않는다.
+  *
+  *  @Autowired(required = false)
+  *  public void setNoBean1(Member noBean1) { //Member 클래스는 스프링 Bean 이 아니므로, 주입할 Member 객체가 없는 상태다.
+  *    System.out.println("noBean1 = " + noBean1); //메소드 자체가 호출되지 않으므로 아무것도 출력되지 않는다.
+  *  }
+  *
+  * 2) org.springframework.lang.Nullable;
+  *  @Nullable 을 붙이면 의존관계 주입시 주입할 대상이 없으면 null 을 참조하도록 한다.
+  *
+  *  @Autowired
+  *  public void setNoBean2(@Nullable Member noBean2) {
+  *    System.out.println("noBean2 = " + noBean2); // noBean2 는 null 을 참조한다. noBean2 = null 출력.
+  *  }
+  *
+  * 3) Optional<T>
+  * 의존관계 주입 시 주입할 대상이 없으면 Optional.empty 를 주입한다.
+  *
+  * @Autowired
+  * public void setNoBean3(Optional<Member> noBean3) {
+  *   System.out.println("noBean3 = " + noBean3); // noBean3 는 Optional.empty 를 참조한다. noBean3 = Optional.empty 출력.
+  * }
+  *
+  * ※ @Nullable 이나 Optional<T> 는 스프링 프레임워크 전반에 지원된다.
+  *   예를 들어, 생성자 주입에서 일부분 필드에만 해당 어노테이션을 사용할 수 있다.
   *
   * */
 
