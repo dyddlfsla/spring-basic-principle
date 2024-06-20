@@ -138,6 +138,50 @@ public class $11_SpringDependencyInjection {
   *
   * solution => 항상 생성자 주입을 기본으로 사용하라! 그리고 가끔 의존관계 변경이 필요한 경우에만 수정자 주입을 사용한다.
   *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅳ. Lombok 라이브러리 추가하기.
+  *
+  * 실무에서 스프링 개발을 하다보면, 대부분의 Bean 의존관계가 불변이고 final 키워드도 사용하게 된다.
+  * 그러면 생성자 코드도 작성해야 하고.. 주입 받은 객체를 필드에 대입시켜야 하고..
+  * 조금 더 코드를 간편하게 작성할 수는 없을까?
+  *
+  * ◆ Lombok 라이브러리
+  * Lombok 이란, Java 애플리케이션 개발에서 비즈니스 로직에 포함되진 않지만,
+  * 반복적으로 작성해야 하는 코드(일명, 보일러플레이트-boilerplate) 코드들을 좀 더 효율적으로 작성할 수 있도록 도와주는 라이브러이이다.
+  *
+  * ◆ Lombok 적용 방법.
+  * 1) build.gradle 에 라이브러리 추가.
+  *   gradle 프로젝트라면, build.gradle 파일에서 lombok 라이브러리를 추가해야 한다.
+  *
+  * configurations {
+  *   	compileOnly {
+  *   		extendsFrom annotationProcessor
+  *   	}
+  *   }
+  *
+  * dependencies {
+  *  	compileOnly('org.projectlombok:lombok')
+  *  	annotationProcessor('org.projectlombok:lombok')
+  *
+  *  	testCompileOnly('org.projectlombok:lombok')
+  *  	testAnnotationProcessor('org.projectlombok:lombok')
+  * }
+  * 프로젝트를 다시 빌드한 후, 라이브러리가 잘 추가되었는지 확인한다.
+  *
+  * 2) IntelliJ Preference -> Setting -> plugin -> lombok 플러그인 추가.
+  *             Preference -> Annotation Processor -> Enable annotation processing 체크.
+  *
+  * 3) Lombok 의 어노테이션 활용하기.
+  *   - @Getter, @Setter : 클래스 필드에 대해 자동으로 Getter, Setter 메소드를 추가해준다.
+  *   - @ToString : 클래스의 toString() 메소드를 자동으로 재정의해준다.
+  *   - @EqualsAndHashCode : 클래스의 equals() 와 hashCode() 를 자동으로 재정의해준다.
+  *   - @NoArgsConstructor, @AllArgsConstructor, @RequiredArgsConstructor : 클래스의 생성자 코드를 추가해준다.
+  *     ▶ @NoArgsConstructor: 매개변수가 없는 기본 생성자 생성.
+  *     ▶ @AllArgsConstructor: 클래스에 선언된 모든 필드를 매개변수로 갖는 생성자 생성.
+  *     ▶ @RequiredArgsConstructor: final 이 붙은 필드나 @NonNull 이 붙은 필드를 매개변수로 갖는 생성자 생성.
+  *   - @Data : @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor 를 모두 포함하는 종합 어노테이션이다.
+  *   - @Builder : 클래스에 Builder 패턴 코드를 추가해준다.
   *
   *
   *
