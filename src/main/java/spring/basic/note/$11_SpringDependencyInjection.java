@@ -204,7 +204,7 @@ public class $11_SpringDependencyInjection {
   * DiscountPolicy 타입의 Bean 을 검색한다. 그리고 DiscountPolicy 타입의 Bean 은 RateDiscountPolicy 객체 하나만 있으므로
   * 안정적으로 this.discountPolicy 에 RateDiscountPolicy 객체를 주입시켜 줄 수 있다.
   *
-  * 그렇다면, 만약 DiscountPolicy 타입의 Bean 이 하나가 아니라 2개 이상이면 어떻게 될까?
+  * ▶ 그렇다면, 만약 DiscountPolicy 타입의 Bean 이 하나가 아니라 2개 이상이면 어떻게 될까?
   *
   * @Component //FixDiscountPolicy 에 @Component 를 붙여 스프링 Bean 으로 등록한다.
   * public class FixDiscountPolicy implements DiscountPolicy { ... }
@@ -216,7 +216,7 @@ public class $11_SpringDependencyInjection {
   * UnsatisfiedDependencyException: Error creating bean with name 'orderServiceImpl'
   * expected single matching bean but found 2: fixDiscountPolicy,rateDiscountPolicy
   *
-  * 말 그대로 매칭되는 Bean 이 두 개가 있어, 어느 것을 주입시킬지 몰라 의존관계 주입에 실패했다는 것이다.
+  * 말 그대로 매칭되는 Bean 이 두 개 있어, 어느 것을 주입시킬지 몰라 의존관계 주입에 실패했다는 것이다.
   * 이런 상황에서, 매개변수 타입을 하위타입으로 FixDiscountPolicy discountPolicy 와 같이 선언하면
   * FixDiscountPolicy 객체는 하나만 존재하므로 다시 혼동없이 주입시킬 수 있을 것이다.
   *
@@ -226,6 +226,76 @@ public class $11_SpringDependencyInjection {
   * 스프링은 Bean 검색 시 Bean 이 중복되는 문제에 대해 여러가지 해결책을 제시한다.
   *
   * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅵ. 의존관계 주입 시 Bean 충돌 해결하기 - @Autowired 변수명, @Qualifier, @Primary
+  *
+  * @Autowired 사용 시 Bean 이 충돌하는 경우, 해결 방법을 하나씩 알아보자.
+  *
+  * 1) @Autowired 의 필드이름 또는 매개변수이름 변경하기.
+  * @Autowired 는 의존관계 주입을 위해 Bean 을 검색할 때 매개변수의 타입으로 검색한다고 했다.
+  * 사실, @Autowired 는 첫 번째 단계로 타입 매칭을 시도하고 타입 매칭으로 검색되는 Bean 이 2개 이상 존재하면
+  * @Autowired 가 적용된 필드의 이름 또는 매개변수의 이름과 등록된 Bean 의 이름을 비교하면서 한번 더 주입할 Bean 을 찾는다.
+  *
+  * @Autowired
+  * private final DiscountPolicy discountPolicy;
+  *
+  * @Autowired
+  * public OrderServiceImpl(DiscountPolicy discountPolicy) {...} 로 @Autowired 가 적용되어 있을 때,
+  *
+  * 변수이름은 discountPolicy 가 되는데, @Autowired 는 이 변수이름과 등록된 Bean 의 이름을 조사하여 비교하는 것이다.
+  * 앞서, @ComponentScan 에 대해 학습할 때, @Component 으로 Bean 을 등록하면 클래스의 이름에서 첫글자만 소문자로 바꾼 뒤,
+  * 그것을 Bean 의 이름으로 사용한다고 했었다.
+  *
+  * 즉, FixDiscountPolicy 클래스는 `fixDiscountPolicy` 라는 이름의 Bean 이 되고,
+  * RateDiscountPolicy 클래스는 `rateDiscountPolicy' 라는 이름의 Bean 이 될텐데,
+  * 이때 변수이름을 Bean 이름과 동일하도록 바꾸면 , Bean 이 충돌하지 않고 이름이 일치하는 변수와 Bean 객체가 주입된다.
+  *
+  * @Autowired
+  * private final DiscountPolicy fixDiscountPolicy; // 변수이름과 일치하는 `fixDiscountPolicy` Bean 이 주입된다.
+  *
+  * 여기서 주의할 것은, @Autowired 의 타입 매칭과 이름 매칭은 동시에 이루어지는게 아니라는 것이다.
+  * 타입 매칭이 먼저 수행되고, 같은 타입의 Bean 2개 이상일때만 추가로 이름 매칭을 시도하는 것이다.
+  *
+  * 2) @Qualifier 사용하기.
+  *
+  * @Qualifier 는 추가 구분자를 붙여주는 방법인데 다음과 같이 사용할 수 있다.
+  *
+  * @Qualifier("mainDiscountPolicy") // 각각의 Bean 에 @Qualifier("식별자") 를 추가해준다.
+  * public class FixDiscountPolicy implements DiscountPolicy {...}
+  *
+  * @Qualifier("subDiscountPolicy")
+  * public class RateDiscountPolicy implements DiscountPolicy {...}
+  *
+  * @Autowired
+  * public Service(@Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy) { //의존관계 주입 시 필드나 매개변수 앞에 연결할 Bean 을 구체적으로 지정한다.
+  *   this.discountPolicy = discountPolicy;
+  * }
+  *
+  * 여기서 재밌는 것은 만약, @Qualifier("mainDiscountPolicy") 가 선언된 Bean 을 찾지 못하면 어떻게 될까?
+  * 그러면 컨테이너는 @Qualifier 사용된 식별자 `mainDiscountPolicy` 을 등록된 Bean 의 이름과 비교하며 다시 찾는다.
+  * 또, @Qualifier 는 Bean 을 구분하는데 사용할 추가 식별자를 제공하는 것이지, Bean 이름을 변경하는게 아니다.
+  *
+  * 3) @Primary 사용하기.
+  *
+  * @Primary 는 검색된 Bean 이 충돌할 때, 어느 한쪽 Bean 의 우선순위를 높여주는 방법이다.
+  * 즉, 2개 이상의 Bean 충돌하면 @Primary 를 가지고 있는 Bean 이 다른 Bean 보다 우선순위를 가지게 되어 의존관계 주입에 사용된다.
+  *
+  * @Primary
+  * public class FixDiscountPolicy implements DiscountPolicy {...} // FixDiscountPolicy 는 @Primary 가 선언되어 있고
+  *
+  * public class RateDiscountPolicy implements DiscountPolicy {...} // RateDiscountPolicy 는 @Primary 가 선언되어 있지 않다.
+  *
+  * 따라서, 이 두 개의 Bean 충돌하는 경우 @Primary 를 가진 FixDiscountPolicy 가 우선권을 가져 의존관계 주입에 사용된다.
+  *
+  *
+  * ※ 만약 @Qualifier 와 @Primary 를 동시에 사용하면 어떻게 될까?
+  * 사실 이것은 자바의 호출 우선순위와 비슷하다고 할 수 있는데, 자바와 스프링에서는 항상 더 `구체적인` 것이 우선순위를 가진다.
+  * 즉, 구체적인 정도를 비교하자면 식별자를 사용하여 맺어주는 @Qualifier 가 @Primary 보다 더 구체적이라고 할 수 있다.
+  * 그래서 @Qualifier 와 @Primary 가 같이 사용된다면, @Qualifier 가 먼저 작동한다.
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  *
   *
   *
   *
