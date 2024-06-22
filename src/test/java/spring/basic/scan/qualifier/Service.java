@@ -2,19 +2,18 @@ package spring.basic.scan.qualifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import spring.basic.discount.DiscountPolicy;
 
 @Component
 public class Service {
 
-  private final DiscountPolicy discountPolicy;
+  private final C c;
 
   @Autowired
-  public Service(DiscountPolicy discountPolicy) {
-    this.discountPolicy = discountPolicy;
+  public Service(C c) {
+    this.c = c;
   }
 
-  public DiscountPolicy getDiscountPolicy() {
-    return discountPolicy;
+  public C getC() {
+    return c;
   }
 }

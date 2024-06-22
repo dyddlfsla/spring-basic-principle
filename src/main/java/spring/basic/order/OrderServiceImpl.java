@@ -1,13 +1,14 @@
 package spring.basic.order;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import spring.basic.annotation.MainDiscountPolicy;
 import spring.basic.discount.DiscountPolicy;
 import spring.basic.member.Member;
 import spring.basic.member.MemberRepository;
 
 @Component
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
   //  private final MemberRepository memberRepository = new MemoryMemberRepository();
@@ -58,11 +59,11 @@ public class OrderServiceImpl implements OrderService {
    * 그래서 이것을 DI(Dependency Injection) 의존 관계 주입 또는 의존성 주입이라고 한다.
    *
    * */
-//  @Autowired
-//  public OrderServiceImpl(DiscountPolicy discountPolicy, MemberRepository memberRepository) {
-//    this.discountPolicy = discountPolicy;
-//    this.memberRepository = memberRepository;
-//  }
+  @Autowired
+  public OrderServiceImpl(@MainDiscountPolicy DiscountPolicy discountPolicy, MemberRepository memberRepository) {
+    this.discountPolicy = discountPolicy;
+    this.memberRepository = memberRepository;
+  }
 
 //  @Autowired
 //  public void setDiscountPolicy(DiscountPolicy discountPolicy) {

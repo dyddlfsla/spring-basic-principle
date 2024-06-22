@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import spring.basic.discount.DiscountPolicy;
 
 public class QualifierTest {
 
@@ -19,9 +18,9 @@ public class QualifierTest {
   void qualifier() {
     ApplicationContext ac = new AnnotationConfigApplicationContext(TestComponentScan.class);
     Service bean = ac.getBean(Service.class);
-    DiscountPolicy discountPolicy = bean.getDiscountPolicy();
+    C c = bean.getC();
 
-    assertThat(discountPolicy).isExactlyInstanceOf(FixDiscountPolicy.class);
+    assertThat(c).isExactlyInstanceOf(A.class);
   }
 
 }

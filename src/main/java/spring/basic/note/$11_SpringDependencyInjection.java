@@ -295,7 +295,24 @@ public class $11_SpringDependencyInjection {
   *
   * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
+  * Ⅶ. 스프링이 제공하는 어노테이션을 재정의해서 사용해보기.
   *
+  * @Qualifier("mainDiscountPolicy") 와 같이 사용했지만, 한편으로는 다음과 같이 @Qualifier 를 포함하는 새로운 애노테이션을 정의할 수 도 있다.
+  *
+  * @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+  * @Retention(RetentionPolicy.RUNTIME)
+  * @Inherited
+  * @Documented
+  * @Qualifier("mainDiscountPolicy")
+  * public @interface MainDiscountPolicy {} // @Qualifier 를 포함하는 @MainDiscountPolicy 정의.
+  *
+  * @Autowired
+  * public OrderServiceImpl(@MainDiscountPolicy DiscountPolicy discountPolicy) {...}
+  *
+  * 그런데 자바의 애노테이션 문법은 상속이라는 개념이 없다. 이렇게 정의된 애노테이션을 또 다른 애노테이션에 포함시켜
+  * 종합적인 효과를 얻는 것은 스프링이 지원해주는 기능이다. 여기서는 @Qualifier 를 예로 들었지만,
+  * 스프링의 여러 애노테이션들도 필요에 따라 임의로 재정의하여 사용할 수 있다.
+  * 그렇다고 해서, 스프링 애노테이션만으로도 충분히 기능을 발휘하는 것을 굳이 재정의해서 사용하는 것은 불필요한 혼란을 초래할 수 있다.
   *
   *
   *
