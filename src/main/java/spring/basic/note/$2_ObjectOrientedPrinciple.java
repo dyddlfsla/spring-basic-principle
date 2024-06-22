@@ -60,12 +60,12 @@ public class $2_ObjectOrientedPrinciple {
    * ISP: 인터페이스 분리 원칙
    * DIP: 의존관계 역전 원칙
    *
-   * ◆ SRP 단일 책임 원칙 - Single responsibility principle
+   * 1) SRP 단일 책임 원칙 - Single responsibility principle
    * - 하나의 클래스는 하나의 책임만을 가져야 한다.
    * - 하나의 책임이란? 정의하기 모호하다.
    * - 중요한 기준은 결국 변경이다. 어떠한 변경이 있을 때 그로 인한 파급 효과가 적어야지 단일 책임 원칙을 잘 따른 것.
    *
-   * ◆ OCP 개방/폐쇄 원칙 - Open/Closed principle
+   * 2) OCP 개방/폐쇄 원칙 - Open/Closed principle
    * - 소프트웨어 요소는 확장에는 열려 있으나 변경에는 닫혀 있어야 한다.
    * - 이런 마법 같은 말이? 확장을 하려면 당연히 기존 코드를 변경해야 하는 것이 아닌가?
    * - 인터페이스를 구현한 새로운 클래스를 만드는 것은 기존 코드를 변경하는 것은 아니다.
@@ -79,19 +79,19 @@ public class $2_ObjectOrientedPrinciple {
    *   어떻게 이 문제를 해결할 것인가?
    *   객체를 생성하고, 연관 관계를 맺어주는 별도의 조립자, 설정자가 필요하다.
    *
-   * ◆ LSP 리스코프 치환 원칙 - Liskov substitution principle
+   * 3) LSP 리스코프 치환 원칙 - Liskov substitution principle
    * 프로그램 객체는 프로그램의 정확성을 깨뜨리지 않으면서 하위 타입의 인스턴스로 변경할 수 있어야 한다.
    * 다형성에서 하위 클래스는 인터페이스 규약을 다 지켜야 한다는 것, 다형성을 지원하기 위한 원칙,
    * 인터페이스를 구현한 구현체를 믿고 사용하려면 이 원칙이 필요하다.
    * - 단순한 컴파일 성공 유무를 말하는 것이 아니다.
    * - 자동차의 엑셀 인터페이스가 앞으로 전진하라는 기능으로 설계 되었다면 그 구현 객체들은 그 기능을 반드시 보장해야만 한다.
    *
-   * ◆ ISP 인터페이스 분리 원칙 - Interface segregation principle
+   * 4) ISP 인터페이스 분리 원칙 - Interface segregation principle
    * -특정 클라이언트를 위한 하나의 범용 인터페이스보다 여러 개로 분리된 작은 인터페이스가 낫다.
    * - 자동차 인터페이스 → 운전 인터페이스와 정비 인터페이스로 분리.
    * - 하나 하나의 인터페이스가 명확해야 하고, 대체가 쉬워야 한다.
    *
-   * ◆ DIP 의존 관계 역전 원칙 - Dependency inversion principle
+   * 5) DIP 의존 관계 역전 원칙 - Dependency inversion principle
    * - 프로그래머는 "추상화에 의존해야지, 구체화에 의존해서는 안된다."
    * - 다시 말해, 구현 클래스에 의존하지 말고, 인터페이스에 의존해야 한다는 것이다.
    * - 앞서 이야기한 역할에 의존해야 한다는 것이다.

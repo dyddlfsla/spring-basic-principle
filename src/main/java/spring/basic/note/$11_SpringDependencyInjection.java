@@ -52,7 +52,7 @@ public class $11_SpringDependencyInjection {
   * ◆ 필드 주입
   * 클래스의 필드에 직접 의존관계를 주입하는 방식이다.
   * 필드 주입은 다음과 같은 특징을 가지고 있다.
-  * 1) 코드가 간단해지지만 주입된 의존관계를 변경할 방법이 없어지므로 테스트하기 어려운 코드가 된다.
+  * 1) 코드가 간단해지지만 주입된 의존관계를 변경할 방법이 없어 테스트하기 어려운 코드가 된다.
   * 2) DI 컨테이너에 완전히 종속되므로 DI 컨테이너가 없다면 아무것도 할 수 없다.
   * 3) 사용하지 말자.
   *
@@ -93,7 +93,7 @@ public class $11_SpringDependencyInjection {
   *  }
   *
   * 2) org.springframework.lang.Nullable;
-  *  @Nullable 을 붙이면 의존관계 주입시 주입할 대상이 없으면 null 을 참조하도록 한다.
+  *  @Nullable 을 붙이면 의존관계 주입 시 주입할 대상이 없으면 null 을 참조하도록 한다.
   *
   *  @Autowired
   *  public void setNoBean2(@Nullable Member noBean2) {
@@ -115,7 +115,7 @@ public class $11_SpringDependencyInjection {
   *
   * Ⅲ. !important 생성자 주입을 사용하라.
   *
-  * 앞서, 스프링에서 의존관계를 주입할 때 1)생성자 주입, 2)수정자(Setter) 주입 3)필드 주입, 4)메소드 주입
+  * 앞서, 스프링에서 의존관계를 주입할 때 생성자 주입, 수정자(Setter) 주입, 필드 주입, 일반 메소드 주입
   * 을 사용할 수 있다고 했는데 사실 `생성자 주입`을 사용하는 것이 가장 좋은 방법이다.
   *
   * 과거에는 수정자 주입이나 필드 주입을 많이 사용했었지만, 최근에는 스프링을 포함한 여러 DI 프레임워크에서
@@ -128,11 +128,11 @@ public class $11_SpringDependencyInjection {
   *    - 누군가 Setter 메소드를 잘못 사용할 수 있으며, 의존관계를 변경시킬 수 있는 Setter 메소드를 만드는 것은 좋은 설계가 아니다.
   * 3) 생성자 주입은, Bean 이 생성되면서 호출되는 생성자 코드로 딱 1번만 의존관계를 주입시키고 더 이상 호출되지 않는다.
   *    - 의존관계를 불변하게 설계할 수 있다.
-  * 4) 의존관계 필드에 final 키워드를 사용할 수 있다. 따라서 생성자에 의존관계가 누락된 경우 컴파일 오류를 통해 쉽게 파악할 수 있다.
+  * 4) 의존관계 필드에 final 키워드를 사용할 수 있다. 따라서 생성자에 의존관계 주입이 누락된 경우 컴파일 오류를 통해 쉽게 파악할 수 있다.
   *    - 프로그램에서 가장 좋은 오류는 컴파일 오류이다.
   *    - 수정자 주입을 제외한 나머지 방식은 모두 생성자 호출 이후에 호출되므로 final 를 사용할 수 없다.
   *
-  * 정리하자면 생성자 주입은 프레임워크에 의존하지 않고 순수한 자바 언어의 특징을 잘 살리는 방식이다.
+  * 정리하자면 생성자 주입은 프레임워크에 의존하지 않고 순수한 자바 언어의 특징을 잘 살리는 주입 방식이다.
   * 또한, 불가피하게 의존관계가 변경되는 경우에는 생성자 주입을 기본으로 사용하되, 필요한 부분에서만 수정자(Setter) 주입을 사용하면 된다.
   * 생성자 주입과 수정자 주입은 둘 다 같이 사용할 수 있다.
   *
@@ -148,7 +148,7 @@ public class $11_SpringDependencyInjection {
   *
   * ◆ Lombok 라이브러리
   * Lombok 이란, Java 애플리케이션 개발에서 비즈니스 로직에 포함되진 않지만,
-  * 반복적으로 작성해야 하는 코드(일명, 보일러플레이트-boilerplate) 코드들을 좀 더 효율적으로 작성할 수 있도록 도와주는 라이브러이이다.
+  * 반복적으로 작성해야 하는 코드(일명, 보일러플레이트-boilerplate) 들을 좀 더 효율적으로 작성할 수 있도록 도와주는 라이브러리이다.
   *
   * ◆ Lombok 적용 방법.
   * 1) build.gradle 에 라이브러리 추가.
@@ -183,6 +183,49 @@ public class $11_SpringDependencyInjection {
   *   - @Data : @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor 를 모두 포함하는 종합 어노테이션이다.
   *   - @Builder : 클래스에 Builder 패턴 코드를 추가해준다.
   *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅴ. @Autowired 사용 시, 같은 타입의 Bean 이 2개 이상인 경우
+  *
+  * 앞서, @Autowired 를 사용하여 의존 관계를 주입하면
+  * @Autowired 는 주입 대상과 같은 타입의 Bean 을 찾아서 주입해준다.
+  *
+  * @Component
+  * public class RateDiscountPolicy implements DiscountPolicy {...}
+  *
+  * @Autowired
+  * public OrderServiceImpl(DiscountPolicy discountPolicy, MemberRepository memberRepository) {
+  *   this.discountPolicy = discountPolicy;
+  *   this.memberRepository = memberRepository;
+  * }
+  *
+  * 예를 들어, 위의 코드에서 스프링 컨테이너는 this.discountPolicy 변수에 알맞은 스프링 Bean 을 찾아 주입시켜주어야 한다.
+  * 이때, @Autowired 는 타입을 통해 Bean 을 찾는데 매개변수가 DiscountPolicy discountPolicy 로 선언되어 있으므로
+  * DiscountPolicy 타입의 Bean 을 검색한다. 그리고 DiscountPolicy 타입의 Bean 은 RateDiscountPolicy 객체 하나만 있으므로
+  * 안정적으로 this.discountPolicy 에 RateDiscountPolicy 객체를 주입시켜 줄 수 있다.
+  *
+  * 그렇다면, 만약 DiscountPolicy 타입의 Bean 이 하나가 아니라 2개 이상이면 어떻게 될까?
+  *
+  * @Component //FixDiscountPolicy 에 @Component 를 붙여 스프링 Bean 으로 등록한다.
+  * public class FixDiscountPolicy implements DiscountPolicy { ... }
+  *
+  * 이제, DiscountPolicy 타입의 Bean 은 RateDiscountPolicy 와 FixDiscountPolicy 로 2개가 된다.
+  * @Autowired 는 두 개의 Bean 중 어느 Bean 을 this.discountPolicy 변수에 넣어야 할까?
+  * 실제로 코드를 실행해보면, 스프링은 다음과 같은 예외를 발생시킨다.
+  *
+  * UnsatisfiedDependencyException: Error creating bean with name 'orderServiceImpl'
+  * expected single matching bean but found 2: fixDiscountPolicy,rateDiscountPolicy
+  *
+  * 말 그대로 매칭되는 Bean 이 두 개가 있어, 어느 것을 주입시킬지 몰라 의존관계 주입에 실패했다는 것이다.
+  * 이런 상황에서, 매개변수 타입을 하위타입으로 FixDiscountPolicy discountPolicy 와 같이 선언하면
+  * FixDiscountPolicy 객체는 하나만 존재하므로 다시 혼동없이 주입시킬 수 있을 것이다.
+  *
+  * 그러나 이런 해결 방식은 DIP 원칙을 위반할 뿐만 아니라, 이름만 다르고 아예 타입이 동일한 bean 이 2개 이상 존재하는 경우
+  * 다시 문제가 된다.
+  *
+  * 스프링은 Bean 검색 시 Bean 이 중복되는 문제에 대해 여러가지 해결책을 제시한다.
+  *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
   *
   *

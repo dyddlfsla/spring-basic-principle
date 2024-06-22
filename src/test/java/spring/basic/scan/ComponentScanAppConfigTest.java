@@ -8,7 +8,7 @@ import spring.basic.ComponentScanAppConfig;
 import spring.basic.member.MemberService;
 
 @SpringBootTest
-public class AutoWiredAppConfigTest {
+public class ComponentScanAppConfigTest {
 
   @Test
   void basicScan() {
