@@ -314,6 +314,26 @@ public class $11_SpringDependencyInjection {
   * 스프링의 여러 애노테이션들도 필요에 따라 임의로 재정의하여 사용할 수 있다.
   * 그렇다고 해서, 스프링 애노테이션만으로도 충분히 기능을 발휘하는 것을 굳이 재정의해서 사용하는 것은 불필요한 혼란을 초래할 수 있다.
   *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅷ. 스프링이 제공하는 Bean 컬렉션 Map 과 List
+  *
+  * 스프링 프레임워크에는 컨테이너에 등록된 Bean 들을 Map 이나  List 에 담아 반환해주는 기능이 있다.
+  *
+  * 예를 들어, 다음과 같이 생성자 매개변수에 Map<String, DiscountPolicy> policyMap, List<DiscountPolicy> policyList 을 선언하면
+  *
+  * ▶ public DiscountService(Map<String, DiscountPolicy> policyMap, List<DiscountPolicy> policyList) {...}
+  *   //policyMap 안에는 Bean 의 이름을 key 로, 해당 이름을 가진 Bean 객체를 value 로 하는 entry 가 저장되어 있다..
+  *
+  * 사용자가 직접 Map 을 생성하고 put() 을 통해 Bean 을 추가하지 않더라도, 이미 Bean 들이 저장되어 있는 컬렉션을 스프링이 제공한다는 것이다.
+  * 이러한 기능은 애플리케이션 개발에서 전략 패턴을 구현할 때 손쉽게 구현하도록 도와준다.
+  * 예를 들어, 클라이언트가 직접 정액 할인과, 정률 할인 중 하나를 선택하는 상황이라면 서비스 코드에서 직접 컨테이터를 호출해
+  * DiscountPolicy 타입의 Bean 을 찾지 않아도 policyMap.get("fixDiscountPolicy"); 로 쉽게 원하는 Bean 을 얻을 수 있다.
+  *
+  *
+  * ※ 한 가지 더, 우리가 스프링 컨테이너를 생성하기 위해 사용하는 new AnnotationConfigApplicationContext(); 은
+  * 실제로 스프링 컨테이너를 생성하기도 하지만 매개값으로 전달된 클래스도 스프링 Bean 으로 등록한다.
+  * 즉, new AnnotationConfigApplicationContext(A.class); 라고 할 때, A 클래스는 @ComponentScan 대상이 아니어도 스프링 Bean 이 된다.
   *
   *
   * */
