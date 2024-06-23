@@ -130,13 +130,13 @@ public class $11_SpringDependencyInjection {
   *    - 의존관계를 불변하게 설계할 수 있다.
   * 4) 의존관계 필드에 final 키워드를 사용할 수 있다. 따라서 생성자에 의존관계 주입이 누락된 경우 컴파일 오류를 통해 쉽게 파악할 수 있다.
   *    - 프로그램에서 가장 좋은 오류는 컴파일 오류이다.
-  *    - 수정자 주입을 제외한 나머지 방식은 모두 생성자 호출 이후에 호출되므로 final 를 사용할 수 없다.
+  *    - 생성자 주입을 제외한 나머지 방식은 모두 생성자 호출 이후에 호출되므로 final 를 사용할 수 없다.
   *
   * 정리하자면 생성자 주입은 프레임워크에 의존하지 않고 순수한 자바 언어의 특징을 잘 살리는 주입 방식이다.
   * 또한, 불가피하게 의존관계가 변경되는 경우에는 생성자 주입을 기본으로 사용하되, 필요한 부분에서만 수정자(Setter) 주입을 사용하면 된다.
   * 생성자 주입과 수정자 주입은 둘 다 같이 사용할 수 있다.
   *
-  * solution => 항상 생성자 주입을 기본으로 사용하라! 그리고 가끔 의존관계 변경이 필요한 경우에만 수정자 주입을 사용한다.
+  * conclusion => 항상 생성자 주입을 기본으로 사용하라! 그리고 가끔 의존관계 변경이 필요한 경우에만 수정자 주입을 사용한다.
   *
   * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
@@ -187,8 +187,7 @@ public class $11_SpringDependencyInjection {
   *
   * Ⅴ. @Autowired 사용 시, 같은 타입의 Bean 이 2개 이상인 경우
   *
-  * 앞서, @Autowired 를 사용하여 의존 관계를 주입하면
-  * @Autowired 는 주입 대상과 같은 타입의 Bean 을 찾아서 주입해준다.
+  * 앞서, @Autowired 를 사용하여 의존 관계를 주입하면 @Autowired 는 주입 대상과 같은 타입의 Bean 을 찾아서 주입해준다.
   *
   * @Component
   * public class RateDiscountPolicy implements DiscountPolicy {...}
@@ -206,8 +205,8 @@ public class $11_SpringDependencyInjection {
   *
   * ▶ 그렇다면, 만약 DiscountPolicy 타입의 Bean 이 하나가 아니라 2개 이상이면 어떻게 될까?
   *
-  * @Component //FixDiscountPolicy 에 @Component 를 붙여 스프링 Bean 으로 등록한다.
-  * public class FixDiscountPolicy implements DiscountPolicy { ... }
+  * @Component
+  * public class FixDiscountPolicy implements DiscountPolicy { ... } //FixDiscountPolicy 도 Bean 으로 등록한다.
   *
   * 이제, DiscountPolicy 타입의 Bean 은 RateDiscountPolicy 와 FixDiscountPolicy 로 2개가 된다.
   * @Autowired 는 두 개의 Bean 중 어느 Bean 을 this.discountPolicy 변수에 넣어야 할까?
@@ -218,7 +217,7 @@ public class $11_SpringDependencyInjection {
   *
   * 말 그대로 매칭되는 Bean 이 두 개 있어, 어느 것을 주입시킬지 몰라 의존관계 주입에 실패했다는 것이다.
   * 이런 상황에서, 매개변수 타입을 하위타입으로 FixDiscountPolicy discountPolicy 와 같이 선언하면
-  * FixDiscountPolicy 객체는 하나만 존재하므로 다시 혼동없이 주입시킬 수 있을 것이다.
+  * FixDiscountPolicy 타입의 객체는 하나만 존재하므로 다시 혼동없이 주입시킬 수 있을 것이다.
   *
   * 그러나 이런 해결 방식은 DIP 원칙을 위반할 뿐만 아니라, 이름만 다르고 아예 타입이 동일한 bean 이 2개 이상 존재하는 경우
   * 다시 문제가 된다.
@@ -234,7 +233,7 @@ public class $11_SpringDependencyInjection {
   * 1) @Autowired 의 필드이름 또는 매개변수이름 변경하기.
   * @Autowired 는 의존관계 주입을 위해 Bean 을 검색할 때 매개변수의 타입으로 검색한다고 했다.
   * 사실, @Autowired 는 첫 번째 단계로 타입 매칭을 시도하고 타입 매칭으로 검색되는 Bean 이 2개 이상 존재하면
-  * @Autowired 가 적용된 필드의 이름 또는 매개변수의 이름과 등록된 Bean 의 이름을 비교하면서 한번 더 주입할 Bean 을 찾는다.
+  * @Autowired 가 적용된 필드의 이름 또는 매개변수의 이름을 가지고 컨테이너에 등록된 Bean 의 이름과 비교한다.
   *
   * @Autowired
   * private final DiscountPolicy discountPolicy;
@@ -242,19 +241,19 @@ public class $11_SpringDependencyInjection {
   * @Autowired
   * public OrderServiceImpl(DiscountPolicy discountPolicy) {...} 로 @Autowired 가 적용되어 있을 때,
   *
-  * 변수이름은 discountPolicy 가 되는데, @Autowired 는 이 변수이름과 등록된 Bean 의 이름을 조사하여 비교하는 것이다.
+  * 변수의 이름은 discountPolicy 인데, @Autowired 는 이 변수 이름과 같은 이름을 가진 Bean 이 있는지 검사하는 것이다.
   * 앞서, @ComponentScan 에 대해 학습할 때, @Component 으로 Bean 을 등록하면 클래스의 이름에서 첫글자만 소문자로 바꾼 뒤,
   * 그것을 Bean 의 이름으로 사용한다고 했었다.
   *
   * 즉, FixDiscountPolicy 클래스는 `fixDiscountPolicy` 라는 이름의 Bean 이 되고,
   * RateDiscountPolicy 클래스는 `rateDiscountPolicy' 라는 이름의 Bean 이 될텐데,
-  * 이때 변수이름을 Bean 이름과 동일하도록 바꾸면 , Bean 이 충돌하지 않고 이름이 일치하는 변수와 Bean 객체가 주입된다.
+  * 이때 변수이름을 Bean 이름과 동일하도록 바꾸면 , 이름이 일치하는 Bean 객체가 주입된다.
   *
   * @Autowired
   * private final DiscountPolicy fixDiscountPolicy; // 변수이름과 일치하는 `fixDiscountPolicy` Bean 이 주입된다.
   *
   * 여기서 주의할 것은, @Autowired 의 타입 매칭과 이름 매칭은 동시에 이루어지는게 아니라는 것이다.
-  * 타입 매칭이 먼저 수행되고, 같은 타입의 Bean 2개 이상일때만 추가로 이름 매칭을 시도하는 것이다.
+  * 타입 매칭이 먼저 수행되고, 같은 타입의 Bean 이 2개 이상이면 추가로 이름 매칭을 시도하는 것이다.
   *
   * 2) @Qualifier 사용하기.
   *
@@ -267,12 +266,12 @@ public class $11_SpringDependencyInjection {
   * public class RateDiscountPolicy implements DiscountPolicy {...}
   *
   * @Autowired
-  * public Service(@Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy) { //의존관계 주입 시 필드나 매개변수 앞에 연결할 Bean 을 구체적으로 지정한다.
+  * public Service(@Qualifier("mainDiscountPolicy") DiscountPolicy discountPolicy) { //필드나 매개변수 앞에 주입할 Bean 의 Qualifier 를 지정한다.
   *   this.discountPolicy = discountPolicy;
   * }
   *
   * 여기서 재밌는 것은 만약, @Qualifier("mainDiscountPolicy") 가 선언된 Bean 을 찾지 못하면 어떻게 될까?
-  * 그러면 컨테이너는 @Qualifier 사용된 식별자 `mainDiscountPolicy` 을 등록된 Bean 의 이름과 비교하며 다시 찾는다.
+  * 그러면 컨테이너는 @Qualifier 에 사용된 식별자 `mainDiscountPolicy` 을 가지고 등록된 Bean 의 이름과 비교하며 다시 찾는다.
   * 또, @Qualifier 는 Bean 을 구분하는데 사용할 추가 식별자를 제공하는 것이지, Bean 이름을 변경하는게 아니다.
   *
   * 3) @Primary 사용하기.
@@ -285,7 +284,7 @@ public class $11_SpringDependencyInjection {
   *
   * public class RateDiscountPolicy implements DiscountPolicy {...} // RateDiscountPolicy 는 @Primary 가 선언되어 있지 않다.
   *
-  * 따라서, 이 두 개의 Bean 충돌하는 경우 @Primary 를 가진 FixDiscountPolicy 가 우선권을 가져 의존관계 주입에 사용된다.
+  * 따라서, 이 두 개의 Bean 이 충돌하는 경우 @Primary 를 가진 FixDiscountPolicy 가 우선권을 가져 의존관계 주입에 사용된다.
   *
   *
   * ※ 만약 @Qualifier 와 @Primary 를 동시에 사용하면 어떻게 될까?
@@ -304,7 +303,7 @@ public class $11_SpringDependencyInjection {
   * @Inherited
   * @Documented
   * @Qualifier("mainDiscountPolicy")
-  * public @interface MainDiscountPolicy {} // @Qualifier 를 포함하는 @MainDiscountPolicy 정의.
+  * public @interface MainDiscountPolicy {} // @Qualifier 를 포함하는 새로운 어노테이션 @MainDiscountPolicy 정의.
   *
   * @Autowired
   * public OrderServiceImpl(@MainDiscountPolicy DiscountPolicy discountPolicy) {...}
@@ -327,8 +326,8 @@ public class $11_SpringDependencyInjection {
   *
   * 사용자가 직접 Map 을 생성하고 put() 을 통해 Bean 을 추가하지 않더라도, 이미 Bean 들이 저장되어 있는 컬렉션을 스프링이 제공한다는 것이다.
   * 이러한 기능은 애플리케이션 개발에서 전략 패턴을 구현할 때 손쉽게 구현하도록 도와준다.
-  * 예를 들어, 클라이언트가 직접 정액 할인과, 정률 할인 중 하나를 선택하는 상황이라면 서비스 코드에서 직접 컨테이터를 호출해
-  * DiscountPolicy 타입의 Bean 을 찾지 않아도 policyMap.get("fixDiscountPolicy"); 로 쉽게 원하는 Bean 을 얻을 수 있다.
+  * 예를 들어, 클라이언트가 직접 정액 할인과, 정률 할인 중 하나를 선택하는 상황이라면 서비스 코드에서 직접 컨테이너를 호출해
+  * Bean 을 찾지 않아도 policyMap.get("fixDiscountPolicy"); 로 쉽게 원하는 Bean 을 얻을 수 있다.
   *
   *
   * ※ 한 가지 더, 우리가 스프링 컨테이너를 생성하기 위해 사용하는 new AnnotationConfigApplicationContext(); 은
@@ -342,13 +341,13 @@ public class $11_SpringDependencyInjection {
   * @Configuration, @Bean, @ComponentScan, @Component, @Autowired 등등 지금까지 스프링 프레임워크가 제공하는
   * 다양한 Bean 등록 방식과 의존관계 주입 방법을 알아보았다.
   *
-  * 그렇다면 어떤 상황에서 Bean 을 자동적으로 관리하거나 아니면 수동적으로 관리해야 할까?
+  * 그렇다면 어떤 상황에서 Bean 을 자동 관리 또는 수동 관리를 해야 할까?
   *
   * 결론부터 말하자면, 스프링 프레임워크가 처음 공개되고 오늘날까지 점점 발전할수록 스프링은 `자동화` 을 권장하고 있다.
   * 또한 스프링부트 역시 @ComponentScan 을 기본적으로 사용하고 버전업에 따라 추가되는 Bean 들도 자동으로 등록하는 것을 전제로 설계되고 있다.
   *
   * 개발자 입장에서 본다면, 스프링 Bean 하나를 등록할 때 @Component 를 붙여주고 @Autowired 를 통해 연결해주면 끝나는 일을
-  * 매번 @Configuration 클래스를 하나씩 뒤져보면서 @Bean 메소드를 추가하고 Bean 사이의 의존관계를 일일이 주입하는 것은
+  * 매번 @Configuration 클래스를 하나씩 뒤져가면서 @Bean 메소드를 추가하고 Bean 사이의 의존관계를 일일이 주입하는 것은
   * 프로젝트의 크기가 커질수록 점점 부담스러운 작업이 된다.
   *
   * 그리고 무엇보다, Bean 을 자동 관리해도 OCP, DIP 를 충분히 잘 지킨다.
@@ -360,7 +359,7 @@ public class $11_SpringDependencyInjection {
   * 2) 기술지원 로직을 담당하는 Bean: 기술적인 문제나 공통 관심사(AOP) 를 처리할 때 주로 사용된다.
   *                                데이터베이스를 연결하거나 공통 로그를 출력하는 등의 기술들이다.
   *
-  * 업무 로직 Bean 은 그 개수가 많고 개발된 컨트롤러, 서비스, 레파지토리는 유사하고 반복적인 패턴을 가지는 경우가 많다.
+  * 업무 로직 Bean 은 그 개수가 많고 개발되는 컨트롤러, 서비스, 레파지토리는 유사하고 반복적인 패턴을 가지는 경우가 많다.
   * 그렇기 때문에 이런 경우에는 Bean 을 자동적으로 관리하는 것이 좋다. 또 문제가 발생하더라도 어디서 발생하는지
   * 쉽게 파악되는 경우가 많다.
   *
