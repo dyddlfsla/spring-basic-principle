@@ -95,7 +95,7 @@ public class $12_BeanLifeCycle {
   *
   * Ⅲ. @Bean(initMethod = "", destroyMethod = "")
   *
-  * 스프링의 설정 정보 클래스를 통해서도 Bean 의 초기화 콜백과 소멸전 콜백을 사용할 수 있다.
+  * 스프링의 설정 정보 클래스를 통해서 Bean 의 초기화 콜백과 소멸전 콜백을 사용할 수 있다.
   *
   * 다음과 같이, 설정 정보에서 Bean 을 생성하는 @Bean 메소드에서 initMethod, destroyMethod 옵션을 설정하면 된다.
   *
@@ -129,6 +129,37 @@ public class $12_BeanLifeCycle {
   *   - 이때, destroyMethod 의 추론 기능은 메소드 이름이 close, shutdown 인 메소드를 소멸 콜백 메소드르 인식하여 자동 호출한다.
   *   - 그래서, 소멸 콜백 메소드의 이름을 close 로 작성했다면, destroyMethod = "close" 와 같이 명시하지 않아도 자동으로 호출된다.
   *   - 만약, 추론 기능을 사용하기 싫다면 destroyMethod = "" 와 같이 공백으로 지정하면 된다.
+  *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅳ. @PostConstruct, @PreDestroy
+  *
+  * 이 방식은 Bean 이 가지고 있는 일반 메소드에 어노테이션을 붙여줌으로써 초기화, 소멸 콜백 메소드로 만드는 방식이다.
+  *
+  * 가장 쉬운 방식으로, 초기화 콜백 메소드로 사용할 메소드에 @PostConstruct 를
+  * 소멸 콜백 메소드로 사용할 메소드에 @PreDestroy 를 붙여주면 된다.
+  *
+  * @PostConstruct
+  * public void init() {
+  *   System.out.println("초기화 작업 코드");
+  * }
+  *
+  * @PreDestroy
+  * public void close() {
+  *   System.out.println("객체 소멸 전 해야할 작업 코드);
+  * }
+  *
+  * @PostConstruct, @PreDestroy 의 특징.
+  * 1) 최신 스프링에서 가장 권장하는 방식이다.
+  * 2) 애노테이션 하나만 작성하면 되므로 코드가 간결하며, @ComponentScan 과 잘 어울린다.
+  * 3) 패키지를 잘 보면, javax 또는 jakarta 로 시작하는데 이것은 자바 표준 기술이라는 뜻이다.
+  *    - 즉 Spring 에 종속된 기술이 아니므로 스프링 컨테이너뿐만 아니라 다른 DI 컨테이너에서도 작동한다는 것이다.
+  * 4) 유일한 단점은 외부 라이브러리의 메소드를 사용할 수 없다는 것이다.
+  *   - 외부 라이브러리의 메소드로 콜백을 해야할 때는 앞서 배운 @Bean(initMethod = "", destroyMethod = "")를 사용하면 된다.
+  *
+  * Conclusion => 1. 스프링 Bean 의 초기화, 소멸 콜백 메소드를 정의할 때는 @PostConstruct, @PreDestroy 를 기본으로 사용한다.
+  *               2. 외부 라이브러리를 사용해야 할땐 @Bean(initMethod = "", destroyMethod = "") 를 사용한다.
+  *
   *
   *
   * */

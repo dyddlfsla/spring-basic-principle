@@ -1,5 +1,7 @@
 package spring.basic.lifecycle;
 
+import jakarta.annotation.PreDestroy;
+
 public class NetworkClient {
 
   private String url;
@@ -25,13 +27,16 @@ public class NetworkClient {
     System.out.printf("closed: %s%n", url);
   }
 
+
   public void init() {
     System.out.println("Network.init()");
     connect();
     call("initialization success");
   }
 
+  @PreDestroy
   public void close() {
+    System.out.println("Network.close()");
     disconnect();
   }
 }
