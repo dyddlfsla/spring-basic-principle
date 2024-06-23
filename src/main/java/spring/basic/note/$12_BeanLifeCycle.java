@@ -62,6 +62,31 @@ public class $12_BeanLifeCycle {
   * 스프링 컨테이너의 싱글톤 Bean 들은 보통 스프링 컨테이너가 종료되면 그때 같이 소멸되는 생명주기를 갖고 있는데,
   * 모든 Bean 이 다 그런 것은 아니다. 컨테이너의 시작과 종료까지 함께 하는 Bean 이 있는가하면 반대로 생명주기가 짧은 Bean 들도 존재한다.
   *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅱ. 인터페이스 InitializingBean, DisposableBean
+  *
+  * InitializingBean 은 Bean 생성 후 초기화 작업을 담당하는 콜백 메소드를 제공하고
+  * DisposableBean 은 Bean 소멸 전 작업을 담당하는 콜백 메소드를 제공한다.
+  *
+  * 우선 스프링 Bean 객체가 InitializingBean, DisposableBean 인터페이스를 구현하도록 한다.
+  *
+  * public class NetworkClient implements InitializingBean, DisposableBean {
+  *   ...
+  *
+  * //그리고, 각 인터페이스에 정의된 추상메소드를 재정의하면 된다.
+  *
+  *   @Override
+  *   public void afterPropertiesSet() throws Exception { //InitializingBean 의 추상메소드.
+  *     system.out.println("초기화 작업 코드");
+  *   }
+  *   @Override
+  *   public void destroy() throws Exception { //DisposableBean 의 추상메소드.
+  *     System.out.println("객체 소멸 전 해야할 작업 코드);
+  *   }
+  * }
+  *
+  * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
   * */
 
