@@ -78,7 +78,7 @@ public class $12_BeanLifeCycle {
   *
   *   @Override
   *   public void afterPropertiesSet() throws Exception { //InitializingBean 의 추상메소드.
-  *     system.out.println("초기화 작업 코드");
+  *     System.out.println("초기화 작업 코드");
   *   }
   *   @Override
   *   public void destroy() throws Exception { //DisposableBean 의 추상메소드.
@@ -86,7 +86,50 @@ public class $12_BeanLifeCycle {
   *   }
   * }
   *
+  * ◆ InitializingBean, DisposableBean 의 특징.
+  * 1) 이 인터페이스들은 스프링 전용 인터페이스이다. 즉 해당 코드가 스프링 전용 인터페이스에 전적으로 의존하게 된다.
+  * 2) 추상메소드를 재정의하는 방식이므로 초기화, 소멸 메소드의 이름을 변경할 수 없다.
+  * 3) 내가 수정할 수 없는 외부라이브러리에 적용할 수 없다.
+  *
   * ―――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅲ. @Bean(initMethod = "", destroyMethod = "")
+  *
+  * 스프링의 설정 정보 클래스를 통해서도 Bean 의 초기화 콜백과 소멸전 콜백을 사용할 수 있다.
+  *
+  * 다음과 같이, 설정 정보에서 Bean 을 생성하는 @Bean 메소드에서 initMethod, destroyMethod 옵션을 설정하면 된다.
+  *
+  * @Configuration
+  * class LifeCycleConfig {
+  *
+  *  @Bean(initMethod = "init", destroyMethod = "close") // 초기화 콜백으로 init() 을, 소멸전 콜백으로 close()을 지정
+  *  public NetworkClient networkClient() {
+  *    ...
+  *  }
+  *
+  * 그리고 NetworkClient 클래스에서 옵션에 전달한 식별자와 같은 이름의 메소드를 정의해주어야 한다.
+  *
+  * public void init() { // 메소드 이름: init
+  *   System.out.println("초기화 작업 코드");
+  * }
+  *
+  * public void close() { // 메소드 이름: close
+  *   System.out.println("객체 소멸 전 해야할 작업 코드);
+  * }
+  *
+  * ◆ @Bean(initMethod = "", destroyMethod = "") 방식의 특징.
+  *
+  * 1) 초기화, 소멸 메소드의 이름을 자유롭게 정할 수 있다.
+  * 2) 스프링 코드에 의존하지 않는다.
+  * 3) 설정 정보를 사용하기 때문에, 외부 라이브러리에도 콜백 메소드를 적용할 수 있다.
+  *
+  *  - @Bean 의 destroyMethod 옵션에는 특별한 기능이 있다.
+  *   - destroyMethod 의 구현 코드를 보면 String destroyMethod() default "(inferred)"; 인데, 즉 기본값이 추론으로 되어 있다.
+  *   - 외부 라이브러리들의 콜백 메소드 이름은 보통 shutdown, close 인데,
+  *   - 이때, destroyMethod 의 추론 기능은 메소드 이름이 close, shutdown 인 메소드를 소멸 콜백 메소드르 인식하여 자동 호출한다.
+  *   - 그래서, 소멸 콜백 메소드의 이름을 close 로 작성했다면, destroyMethod = "close" 와 같이 명시하지 않아도 자동으로 호출된다.
+  *   - 만약, 추론 기능을 사용하기 싫다면 destroyMethod = "" 와 같이 공백으로 지정하면 된다.
+  *
   *
   * */
 
