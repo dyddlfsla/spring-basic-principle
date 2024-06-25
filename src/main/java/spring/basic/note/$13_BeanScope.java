@@ -80,6 +80,56 @@ public class $13_BeanScope {
   *
   *
   *
+  * ◆ Prototype Scope 와 Singleton Scope 을 함께 사용 시 발생하는 문제.
+  *
+  * 싱글톤 스코프를 가진 Bean 과 프로토타입 스코프를 가진 Bean 과 함께 사용하는 상황을 만들어보자.
+  *
+  * 예를 들어, ClientBean(싱글톤 스코프) 이 부품 객체로 PrototypeBean(프로토타입 스코프) 을 가지고 있고,
+  * 외부 클라이언트로부터 요청이 오면 ClientBean 의 logic() 을 호출한다고 하자.
+  *
+  * class ClientBean {
+  *   private final PrototypeBean prototypeBean;
+  *
+  *   public ClientBean(PrototypeBean prototypeBean) { //생성자 주입
+  *     this.prototypeBean = prototypeBean;
+  *    }
+  *
+  *   public int logic() {
+  *     prototypeBean.addCount();
+  *     return prototypeBean.getCount();
+  *   }
+  * }
+  *
+  * ClientA 가 ClientBean 을 조회한 뒤 logic() 을 호출하였다.
+  * 그 다음 ClientB 가 다시 ClientBean 을 조회한 뒤 logic() 을 호출하였다.
+  *
+  * 그렇다면 ClientA 와 ClientB 가 얻는 count 값은 어떻게 될까?
+   * PrototypeBean 은 싱글톤 객체가 아니라고 했으므로
+  * ClientBean 가 가진 PrototypeBean 은 서로 다른 개별 인스턴스가 되고
+  * 따라서 ClientA, ClientB 가 얻게 되는 count 값은 1, 1 이 될 것 같지만,
+  *
+  * 틀렸다. ClientA 는 1을 ClientB 는 2 라는 값을 얻게 될 것이다.
+  * 왜냐하면 ClientBean 이 가진 PrototypeBean 은 서로 다른 개별 인스턴스가 아닌 하나의 PrototypeBean 을 사용하고 있기 때문이다.
+  * 스프링 컨테이너는 외부에서 PrototypeBean 을 조회할 때 새로운 Bean 을 만들어 주는 것이지,
+  * 단순히 PrototypeBean 을 `사용한다고` 해서 새로운 Bean 을 만들어 주는 것이 아니기 때문이다.
+  *
+  * 스프링 컨테이너는 시작과 동시에 싱글톤 스코프인 ClientBean 객체를 생성하는데 이때 부품 객체로 PrototypeBean 이 필요하므로
+  * 스프링 컨테이너는 PrototypeBean 도 같이 생성하여 ClientBean 과 연결시켜놓는다.
+  *
+  * 그 다음, 처음 ClientA 가 ClientBean 을 조회하면, 스프링 컨테이너는 생성해놓은 ClientBean 을 반환할 것이고
+  * ClientB 가 ClientBean 을 조회하면, 컨테이너는 또 다시 만들어 놓았던 ClientBean 을 반환하게 되는데
+  * 당연히 부품 객체로 사용되는 PrototypeBean 객체는 계속 동일한 객체로 유지되고 있는 것이다.
+  * ClientA, ClientB 둘 다 ClientBean 을 조회한 것이지 PrototypeBean 을 조회한 것이 아니므로
+  * PrototypeBean 은 처음 ClientBean 의 생성자 호출 시 생성되고, 그 이상 새로 생성되지 않는다.
+  *
+  * 결국 싱글톤 Bean 과 프로토타입 Bean 을 함께 사용하는 경우,
+  * 어떤 객체를 Prototype 으로 설계함으로써  클라이언트 요청 시마다 새로운 객체를 사용하려던 원래 의도와는 달리
+  * 처음 생성된 PrototypeBean 을 변함없이 그대로 사용하게 되는 문제가 발생한다.
+  *
+  *
+  *
+  *
+  *
   * */
 
 }
