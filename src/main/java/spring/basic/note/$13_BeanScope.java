@@ -126,7 +126,92 @@ public class $13_BeanScope {
   * 어떤 객체를 Prototype 으로 설계함으로써  클라이언트 요청 시마다 새로운 객체를 사용하려던 원래 의도와는 달리
   * 처음 생성된 PrototypeBean 을 변함없이 그대로 사용하게 되는 문제가 발생한다.
   *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
+  * Ⅱ. ObjectProvider 와 jakarta.inject.Provider
+  *
+  *
+  * 어떻게해야 프로토타입 Bean 을 매번 새로 생성하여 사용할 수 있을까?
+  * 스프링 컨테이너는 프로토타입 Bean 을 조회할 때마다 새로운 객체로 생성하여 반환한다고 했다.
+  * 그렇다면, 클라이언트가 요청할 때 스프링 컨테이너에게 Bean 을 `대신 조회해주는 누군가`가 있으면 된다.
+  *
+  * ◆ ObjectProvider, ObjectFactory
+  * 우리는 지금껏 어떤 Bean 을 찾고자 할때, 스프링 컨테이너에게 직접 getBean(); 메소드를 호출하는 방법을 사용했다.
+  * 그런데 스프링에서는 어떤 Bean 을 컨테이너 대신 찾아주는 DL 서비스를 제공하는데,
+  * 이것이 ObjectProvider/ObjectFactory 클래스이다.
+  *
+  * class ClientBean {
+  *   private final ObjectProvider<PrototypeBean> prototypeProvider; // ObjectProvider<T> 사용.
+  *
+  *   public ClientBean(ObjectProvider<PrototypeBean>  prototypeProvider) {
+  *     this.prototypeProvider = prototypeProvider;
+  *   }
+  *
+  *   public int logic() {
+  *     PrototypeBean prototypeBean = prototypeProvider.getObject(); // Provider 의 getObjet() 를 호출해 PrototypeBean 객체 조회.
+  *     prototypeBean.addCount();
+  *     return prototypeBean.getCount();
+  *   }
+  * }
+  *
+  * 위의 코드를 보면, PrototypeBean prototypeBean = prototypeProvider.getObject(); 와 같이
+  * 스프링 컨테이너 대신 ObjectProvider 를 통해 PrototypeBean 을 조회하고 있다.
+  * 프로토타입 Bean 을 조회하면 컨테이너는 항상 새로운 Bean 을 생성해 반환하므로 ObjectProvider 를 통해 얻는 PrototypeBean 은 항상 새로운 인스턴스이다.
+  * 그리고 이제 logic() 는 항상 새로운 PrototypeBean 을 사용하게 된다.
+  *
+  * 기존에는 스프링 컨테이너가 ClientBean 과 PrototypeBean 을 각각 생성한 뒤 ClientBean 에게 PrototypeBean 넣어줌으로써
+  * DI 가 발생했다. 하지만 이제는 ClientBean 이 직접 사용할 PrototypeBean 객체를 ObjectProvider 를 통해 `찾고` 있는 것이다.
+  * 이렇게 의존성이 외부에서 주입되는 것이 아니라, 객체가 직접 의존할 객체를 찾는 것을 DL(Dependency Lookup)이라고 한다.
+  * DI 와 DL 은 객체 간의 의존성을 연결시키는 대표적인 방법이므로 잘 알아두자.
+  *
+  * ObjectProvider/ObjectFactory 는 다음과 같은 특징을 가진다.
+  * 1) 기능이 단순하여, 단위테스트에 사용하기 좋다.
+  * 2) 스프링에 의존적이지만 별도의 라이브러리가 필요 없다.
+  * 3) ObjectFactory 는 Provider 에 부가적인 기능을 더 추가시킨 것이다.
+  *
+  * ◆ jakarta.inject.Provider
+  *
+  * ObjectProvider 대신에 자바 표준 기술이 제공하는 Provider 도 사용할 수 있다.
+  * 이것을 사용하기 위해선 우선 라이브러리를 추가해야 한다.
+  *
+  * ▶ implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
+  *
+  * class ClientBean {
+  *
+  *  private final Provider<PrototypeBean> prototypeProvider; //jakarta.Provider 사용.
+  *
+  *  public ClientBean(Provider<PrototypeBean> prototypeProvider) {
+  *    this.prototypeProvider = prototypeProvider;
+  *   }
+  *
+  *  public int logic() {
+  *    PrototypeBean prototypeBean = prototypeProvider.get(); //Provider 의 get() 을 호출해 PrototypeBean 객체 조회
+  *    prototypeBean.addCount();
+  *    return prototypeBean.getCount();
+  *  }
+  * }
+  *
+  * ObjectProvider 와 달리 jakarta.Provider 는 다음과 같은 특징이 있다.
+  * 1) 메소드가 get() 하나만 존재하여 사용법이 매우 단순하다.
+  * 2) 스프링이 아닌 자바 표준 기술이므로 프레임워크에 의존하지 않는다.
+  * 3) 대신 별도의 라이브러리가 필요하다.
+  * 4) 자바 표준이므로 스프링 컨테이너가 아닌 다른 DI 컨테이너에서도 사용할 수 있다.
+  *
+  * ◆ 그러면 프로토타입 스코프는 언제 사용할까? 어렵게 생각할 필요 없이 어떤 로직을 수행할 때마다 새로운 스프링 Bean 객체를
+  * 사용해야 하는 경우에 사용하면 된다. 그런데 사실, 실무에서는 싱글톤 스코프만으로도 대부분의 문제가 해결되므로
+  * 프로토타입 스코프를 사용하는 경우가 잘 없다.
+  *
+  * 그리고 또한, ObjectProvider, jakarta.Provider 는 꼭 프로토타입 스코프를 처리하기 위해 사용하는 것이 아니라
+  * DL 을 사용해야 하는 상황에서도 언제든지 사용할 수 있다.
+  *
+  * 또, 개발을 하다 보면 이런 경우처럼 비슷한 기능을 자바 표준과 스프링에서 모두 제공하는 경우가 있다.
+  * 이럴 때, 스프링을 써야 할까? 자바 표준을 써야 할까? 종종 오해하는 것이 스프링은 결국 자바 언어로 만들어진 하위 존재이니
+  * 자바 표준이 스프링보다 무조건 낫다고 생각하는 것이다. 그러나 그것은 잘못된 생각이다.
+  * JPA 의 경우, 최종적으로 자바 표준이 개발 시장에서 하이버네이트를 이기고 올라섰으므로, JPA 를 사용해야 하는 것이 맞지만
+  * 스프링의 경우, 스프링이 이미 시장의 표준이 된 것이나 다름없는 지위를 갖고 있다. 그러므로 무조건 자바 표준을 사용하는 것이 아니라
+  * 상황에 따라 각각의 기술을 비교하고 더 나은 것을 사용하는 것이 맞다.
+  *
+  * 보통, 같은 기능을 제공하더라도 자바 표준 기술보다는 스프링이 좀 더 다양하고 편리한 부가 기능을 제공하는 경우가 많다.
   *
   *
   *
