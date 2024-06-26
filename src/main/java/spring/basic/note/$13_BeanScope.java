@@ -19,7 +19,7 @@ public class $13_BeanScope {
   * 스프링의 기본 스코프는 싱글톤 스코프이지만, 싱글톤 스코프외에도 스프링은 다양한 스코프를 지원한다.
   *
   * 1) singleton Scope: 기본 스코프. 스프링 컨테이너의 시작과 종료까지 Bean 인스턴스가 존재한다.
-  * 2) prototype Scope: 스프링 컨테이너가  Bean 의 생성과 의존관계 주입까지만 관여하고 더 이상은 관여하지 않는 방식이다.
+  * 2) prototype Scope: 스프링 컨테이너가 Bean 의 생성과 의존관계 주입까지만 관여하고 더 이상은 관여하지 않는 방식이다.
   *                     매우 짧은 범위의 스코프이다.
   *
   * ◆ 웹 관련 스코프
@@ -82,10 +82,10 @@ public class $13_BeanScope {
   *
   * ◆ Prototype Scope 와 Singleton Scope 을 함께 사용 시 발생하는 문제.
   *
-  * 싱글톤 스코프를 가진 Bean 과 프로토타입 스코프를 가진 Bean 과 함께 사용하는 상황을 만들어보자.
+  * 싱글톤 스코프를 가진 Bean 과 프로토타입 스코프를 가진 Bean 을 함께 사용하는 상황을 만들어보자.
   *
   * 예를 들어, ClientBean(싱글톤 스코프) 이 부품 객체로 PrototypeBean(프로토타입 스코프) 을 가지고 있고,
-  * 외부 클라이언트로부터 요청이 오면 ClientBean 의 logic() 을 호출한다고 하자.
+  * 외부 클라이언트로부터 요청이 오면 ClientBean 의 logic() 을 호출하고 그 결과값으로 count 를 얻는다고 하자.
   *
   * class ClientBean {
   *   private final PrototypeBean prototypeBean;
@@ -95,7 +95,7 @@ public class $13_BeanScope {
   *    }
   *
   *   public int logic() {
-  *     prototypeBean.addCount();
+  *     prototypeBean.addCount(); // 초기값 0인 count 를 count++;
   *     return prototypeBean.getCount();
   *   }
   * }
@@ -104,11 +104,11 @@ public class $13_BeanScope {
   * 그 다음 ClientB 가 다시 ClientBean 을 조회한 뒤 logic() 을 호출하였다.
   *
   * 그렇다면 ClientA 와 ClientB 가 얻는 count 값은 어떻게 될까?
-   * PrototypeBean 은 싱글톤 객체가 아니라고 했으므로
+  * PrototypeBean 은 싱글톤 객체가 아니라고 했으므로
   * ClientBean 가 가진 PrototypeBean 은 서로 다른 개별 인스턴스가 되고
   * 따라서 ClientA, ClientB 가 얻게 되는 count 값은 1, 1 이 될 것 같지만,
   *
-  * 틀렸다. ClientA 는 1을 ClientB 는 2 라는 값을 얻게 될 것이다.
+  * 틀렸다. ClientA 는 1을, ClientB 는 2 라는 값을 얻는다.
   * 왜냐하면 ClientBean 이 가진 PrototypeBean 은 서로 다른 개별 인스턴스가 아닌 하나의 PrototypeBean 을 사용하고 있기 때문이다.
   * 스프링 컨테이너는 외부에서 PrototypeBean 을 조회할 때 새로운 Bean 을 만들어 주는 것이지,
   * 단순히 PrototypeBean 을 `사용한다고` 해서 새로운 Bean 을 만들어 주는 것이 아니기 때문이다.
@@ -130,14 +130,13 @@ public class $13_BeanScope {
   *
   * Ⅱ. ObjectProvider 와 jakarta.inject.Provider
   *
-  *
   * 어떻게해야 프로토타입 Bean 을 매번 새로 생성하여 사용할 수 있을까?
-  * 스프링 컨테이너는 프로토타입 Bean 을 조회할 때마다 새로운 객체로 생성하여 반환한다고 했다.
+  * 스프링 컨테이너는 프로토타입 Bean 을 조회할 때마다 새로운 객체로 생성한다고 했다.
   * 그렇다면, 클라이언트가 요청할 때 스프링 컨테이너에게 Bean 을 `대신 조회해주는 누군가`가 있으면 된다.
   *
   * ◆ ObjectProvider, ObjectFactory
   * 우리는 지금껏 어떤 Bean 을 찾고자 할때, 스프링 컨테이너에게 직접 getBean(); 메소드를 호출하는 방법을 사용했다.
-  * 그런데 스프링에서는 어떤 Bean 을 컨테이너 대신 찾아주는 DL 서비스를 제공하는데,
+  * 그런데 스프링에서는 어떤 Bean 을 컨테이너 대신 찾아주는 DL 서비스를 지원하는데,
   * 이것이 ObjectProvider/ObjectFactory 클래스이다.
   *
   * class ClientBean {
@@ -157,7 +156,7 @@ public class $13_BeanScope {
   * 위의 코드를 보면, PrototypeBean prototypeBean = prototypeProvider.getObject(); 와 같이
   * 스프링 컨테이너 대신 ObjectProvider 를 통해 PrototypeBean 을 조회하고 있다.
   * 프로토타입 Bean 을 조회하면 컨테이너는 항상 새로운 Bean 을 생성해 반환하므로 ObjectProvider 를 통해 얻는 PrototypeBean 은 항상 새로운 인스턴스이다.
-  * 그리고 이제 logic() 는 항상 새로운 PrototypeBean 을 사용하게 된다.
+  * 그래서 이제 logic() 는 항상 새로운 PrototypeBean 을 사용할 수 있다.
   *
   * 기존에는 스프링 컨테이너가 ClientBean 과 PrototypeBean 을 각각 생성한 뒤 ClientBean 에게 PrototypeBean 넣어줌으로써
   * DI 가 발생했다. 하지만 이제는 ClientBean 이 직접 사용할 PrototypeBean 객체를 ObjectProvider 를 통해 `찾고` 있는 것이다.
@@ -204,14 +203,126 @@ public class $13_BeanScope {
   * 그리고 또한, ObjectProvider, jakarta.Provider 는 꼭 프로토타입 스코프를 처리하기 위해 사용하는 것이 아니라
   * DL 을 사용해야 하는 상황에서도 언제든지 사용할 수 있다.
   *
-  * 또, 개발을 하다 보면 이런 경우처럼 비슷한 기능을 자바 표준과 스프링에서 모두 제공하는 경우가 있다.
+  * 또, 개발을 하다 보면 위와 같이, 비슷한 기능을 자바 표준과 스프링에서 모두 제공하는 경우가 있다.
   * 이럴 때, 스프링을 써야 할까? 자바 표준을 써야 할까? 종종 오해하는 것이 스프링은 결국 자바 언어로 만들어진 하위 존재이니
   * 자바 표준이 스프링보다 무조건 낫다고 생각하는 것이다. 그러나 그것은 잘못된 생각이다.
   * JPA 의 경우, 최종적으로 자바 표준이 개발 시장에서 하이버네이트를 이기고 올라섰으므로, JPA 를 사용해야 하는 것이 맞지만
-  * 스프링의 경우, 스프링이 이미 시장의 표준이 된 것이나 다름없는 지위를 갖고 있다. 그러므로 무조건 자바 표준을 사용하는 것이 아니라
+  * 스프링의 경우, 스프링이 이미 시장의 표준과 같은 지위를 갖고 있다. 그러므로 무조건 자바 표준을 사용하는 것이 아니라
   * 상황에 따라 각각의 기술을 비교하고 더 나은 것을 사용하는 것이 맞다.
   *
   * 보통, 같은 기능을 제공하더라도 자바 표준 기술보다는 스프링이 좀 더 다양하고 편리한 부가 기능을 제공하는 경우가 많다.
+  *
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
+  * Ⅲ. 웹 스코프 - request
+  *
+  * 이제는 웹과 관련된 스코프에 대해 알아보자.
+  *
+  * 웹 스코프는 공통적으로 다음과 같은 특징을 가지고 있다.
+  * 1) 웹 스코프는 웹 환경에서만 동작한다.
+  * 2) 웹 스코프는 프로토타입 스코프와는 달리 컨테이너가 종료시점까지 관리해준다. 즉 소멸 콜백 메소드가 호출된다.
+  *
+  * ◆ 웹 스코프의 종류
+  * 1) request: HTTP request 가 들어올때 Bean 이 생성되고 response 가 나가면 Bean 이 소멸되는 스코프.
+  * 2) session: Bean 의 생명주기가 HTTP Session 과 동일한 스코프.
+  * 3) application: Bean 의 생명주기가 ServletContext 와 동일한 스코프.
+  * 4) websocket: Bean 의 생명주기가 web socket 과 동일한 스코프.
+  *
+  * 여기서는 request 만 설명하지만 session 이나 application 의 동작 방식도 다 유사하다.
+  *
+  *
+  * ▶ @Scope("request")
+  * request 스코프는 HTTP 요청 시 Bean 인스턴스를 생성하고 해당 Bean 인스턴스는 서버에서 해당 요청이 처리되는 동안
+  * 다른 요청에 공유되지 않고 `해당 요청 내에서만 사용된다`.
+  *
+  * ※ 스프링을 웹 환경으로 만들기 위해 다음 라이브러리를 추가한다.
+  *   - implementation 'org.springframework.boot:spring-boot-starter-web'
+  *   - 스프링부트는 내장된 Tomcat 서버를 사용하여 웹 서버 위에 스프링 애플리케이션을 실행시킨다.
+  *   - 웹 환경이되면, 관련된 추가 설정과 Bean 들이 필요하므로 AnnotationConfigServletWebServerApplicationContext 라는
+  *     스프링 컨테이너를 사용하게 된다.
+  *
+  * HTTP 요청이 오면 로그를 출력해주는 MyLogger 클래스를 만들고 HTTP 요청 내에서만 사용되므로 @Scope("request") 를 붙여준다.
+  *
+  * @Component
+  * @Scope(value = "request")
+  * public class MyLogger {
+  *
+  *  private String uuid;
+  *
+  *  @PostConstruct // Bean 생성 시 초기화할 작업.
+  *  public void init() {
+  *  uuid = UUID.randomUUID().toString(); // UUID(Universally Unique Identifier)는 고유한 식별자를 생성하기 위한 자바 API 중 하나다.
+  *  }                                    // 분산 시스템이나 데이터베이스 관련 작업시 사용하기 좋다.
+  *
+  * }
+  *
+  * MyLogger 를 사용하는 Controller 는 다음과 같다.
+  *
+  * @Controller
+  * @RequiredArgsConstructor
+  * public class LogDemoController {
+  *
+  *   private final LogDemoService logDemoService;
+  *   private final MyLogger myLogger;
+  *   ...
+  * }
+  *
+  * 이제 애플리케이션을 실행해보면..
+  * 스프링부트에서 Bean 생성에 실패했다는 예외가 발생한다. 무엇이 문제일까?
+  * 코드를 잘 살펴보면, Controller 와 MyLogger 를 생성자 주입을 통해 연결시키는 코드이다.
+  * 그런데 Controller 객체는 싱글톤 스코프이므로 컨테이너 시작과 동시에 인생성이 되지만,
+  * MyLogger 객체는 request 스코프이므로 HTTP 요청이 와야지만 생성되는 것이다.
+  * 우리는 지금 애플리케이션을 실행만 시켰지, HTTP 요청까지 보낸 것이 아니므로 Controller 인스턴스만 존재하고
+  * MyLogger 인스턴스는 존재하지 않는 상황인데, 여기서 의존관계를 연결하려고 하니 예외가 발생하게 된다.
+  *
+  * 그렇다면 이 상황을 어떻게 해결할 수 있을까?
+  *
+  * 지금 문제는 Controller 와 MyLogger 가 서로 다른 스코프를 가지기 때문에 발생하는 문제이다.
+  * 따라서, 생성자 주입을 사용하지 말고 ObjectProvider 를 통해 HTTP 요청이 왔을 때, MyLogger 객체를 꺼내서 사용하면 된다.
+  *
+  * @Controller
+  * @RequiredArgsConstructor
+  * public class LogDemoController {
+  *
+  *   private final ObjectProvider<MyLogger> myLoggerProvider;
+  *
+  *   @RequestMapping("log-demo")
+  *   @ResponseBody
+  *   public String logDemo(HttpServletRequest request) {
+  *     MyLogger myLogger = myLoggerProvider.getObject(); // HTTP 요청이 왔을 때, ObjectProvider 에서 MyLogger 를 꺼내서 사용한다.
+  *     String requestURL = request.getRequestURL().toString();
+  *     myLogger.setRequestURL(requestURL);
+  *     myLogger.log("controller test");
+  *     logDemoService.logic("testId");
+  *     return "OK";
+  *   }
+  *
+  * }
+  *
+  * ※ 현재, Controller 에서 requestURL 이나 MyLogger 를 연결시키고 있는데 이런 코드는 좋은 설계가 아니다.
+  * Controller 보다는 공통 처리가 가능한 인터셉터나 서블릿 필터에서 처리하는 것이 맞다.
+  *
+  * 자, 이제 HTTP 요청을 보내면,
+  *
+  * [54712a51-85dd-452f-91c2-5cb09e2df8bc] request scope been create: spring.basic.common.MyLogger@4ef4769a // 첫 번째 HTTP 요청
+  * [54712a51-85dd-452f-91c2-5cb09e2df8bc] [http://localhost:8080/log-demo] controller test
+  * [54712a51-85dd-452f-91c2-5cb09e2df8bc] [http://localhost:8080/log-demo] service id = testId
+  * [54712a51-85dd-452f-91c2-5cb09e2df8bc] request scope been close: spring.basic.common.MyLogger@4ef4769a
+  *
+  * [3ab02516-50e3-4df6-a410-fe3a7ca86e0c] request scope been create: spring.basic.common.MyLogger@7f197bd0 // 두 번째 HTTP 요청
+  * [3ab02516-50e3-4df6-a410-fe3a7ca86e0c] [http://localhost:8080/log-demo] controller test
+  * [3ab02516-50e3-4df6-a410-fe3a7ca86e0c] [http://localhost:8080/log-demo] service id = testId
+  * [3ab02516-50e3-4df6-a410-fe3a7ca86e0c] request scope been close: spring.basic.common.MyLogger@7f197bd0
+  *
+  * MyLogger 인스턴스가 요청 시마다 생성될 뿐만 아니라, 생성된 MyLogger 인스턴스는 해당 요청 내에서만 독립적으로 사용되는 것을 알 수 있다.
+  * 이처럼, request 스코프는 HTTP 요청부터 응답까지 Bean 인스턴스를 유지한다.
+  *
+  * 이 정도로도 충분한 것 같지만, MyLogger myLogger = myLoggerProvider.getObject(); 처럼 굳이 Bean 꺼내서 사용하는 코드가
+  * 지저분해보인다. 다른 해결 방법은 없을까?
+  *
+  * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+  *
   *
   *
   *
