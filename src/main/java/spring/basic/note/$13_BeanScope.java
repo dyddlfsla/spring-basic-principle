@@ -323,6 +323,81 @@ public class $13_BeanScope {
   *
   * ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
   *
+  * Ⅳ. Scope 와 Proxy
+  *
+  * 그러면 이번에는, 프록시 방식을 사용해보자.
+  *
+  * MyLogger 클래스의 @Scope 에 proxyMode 옵션을 추가한다.
+  *
+  * @Component
+  * @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+  * public class MyLogger {
+  *  ...
+  * }
+  *
+  * 그리고 Controller 클래스에서, 원래 사용했던 생성자 주입 방식으로 돌려놓는다.
+  *
+  * @Controller
+  * @RequiredArgsConstructor
+  * public class LogDemoController {
+  *
+  *   private final LogDemoService logDemoService;
+  *   private final MyLogger myLogger;
+  *   ...
+  * }
+  *
+  * 애플리케이션을 실행해보면..
+  *
+  * [d0469481-e91b-42ff-bfd3-90832ef0b4dc] request scope been create: spring.basic.common.MyLogger@5fdabe7
+  * myLogger = class spring.basic.common.MyLogger$$SpringCGLIB$$0
+  * [d0469481-e91b-42ff-bfd3-90832ef0b4dc] [http://localhost:8080/log-demo] controller test
+  * [d0469481-e91b-42ff-bfd3-90832ef0b4dc] [http://localhost:8080/log-demo] service id = testId
+  * [d0469481-e91b-42ff-bfd3-90832ef0b4dc] request scope been close: spring.basic.common.MyLogger@5fdabe7
+  *
+  * 정상적으로 실행되고 HTTP 요청도 문제없다!
+  * 아니 분명히 아까는 MyLogger 인스턴스가 HTTP 요청이 들어와야만 생성되므로
+  * 애플리케이션 실행 시점에서는 MyLogger 가 없기 때문에 Controller 의 생성자 주입이 실패했었다.
+  *
+  * 그런데, 어떻게 해서 이게 가능해진것일까?
+  *
+  * @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+  * proxyMode 옵션을 사용하게 되면, HTTP 요청이 오지 않은 시점에서도
+  * 스프링 컨테이너가 미리 MyLogger 를 대체하는 가짜 프록시 객체를 만들어두고 그것을 Controller 에 주입시켜 주는 것이다.
+  *
+  * myLogger = class spring.basic.common.MyLogger$$SpringCGLIB$$0
+  * 위의 출력 내용을 보면 알수 있듯이, 현재 사용되고 있는 MyLogger 객체는 내가 작성한 MyLogger 클래스가 아니다.
+  * 뒤에 $$SpringCGLIB$$ 라는 것이 붙어있는데, 기억나는가? 앞서 설정 정보의 클래스를 조작하여 스프링 Bean 의 싱글톤을
+  * 구현하는 그 CGLIB 가 여기서도 사용되고 있다.
+  *
+  * 즉, CGLIB 가 내가 작성한 MyLogger 클래스를 상속하는 또 다른 클래스를 만든 뒤, 프록시 객체를 생성하여
+  * 스프링 Bean 으로 등록시켜버린다. 이 프록시 객체는 실제로 스프링 컨테이너에 "myLogger" 라는 이름을 가지고
+  * 저장된다.
+  *
+  * 그리고 이후 실제 HTTP 요청이 들어오면 프록시 객체는 그때 내부에 존재하는 진짜 MyLogger 를 찾고
+  * MyLogger 에게 대신 명령을 내리게 된다.
+  *
+  * 예를 들어, myLogger.logic() 을 호출하게 되면, 일단 프록시 객체의 logic() 가 호출된다.
+  * 그와 동시에 프록시 객체는 현재 요청 컨텍스트에 존재하는 진짜 MyLogger 객체를 찾은 뒤
+  * MyLogger 객체에게 logic() 메소드 호출을 위임하는 것이다.
+  * 그래서 결과적으로 로그를 출력하는 실제 객체는 MyLogger 인스턴스이다.
+  *
+  * 정리하자면,
+  * @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS) 라는 옵션이 붙으면
+  * 1) CGLIB 는 해당 클래스를 상속받은 프록시 객체를 만들고 그것을 스프링 컨테이너에 `대신` 등록한다.
+  * 2) 이 가짜 프록시 객체는 Bean 으로 주입되어 있다가 실제 HTTP 요청이 와서 MyLogger 의 메소드를 호출하면
+  *   그때 내부에서 진짜 MyLogger 객체를 찾은 뒤 호출된 메소드를 위임한다.
+  * 3) 이 프록시 객체는 실제 request scope 와 관계가 없다. 내부에 단순한 위임 로직만 가지고 텅빈 객체이고
+  *    싱글톤처럼 동작한다.
+  *
+  * 프록시 객체를 활용하면 다음과 같은 장점이 있다.
+  * 1) 프록시 객체 덕분에 request 스코프를 가진 Bean 을 마치 싱글톤 스코프를 가진 Bean 처럼 손쉽게 사용할 수 있다.
+  * 2) Provider 방식, 프록시 방식의 핵심 아이디어는 Bean 인스턴스의 생성을 해당 인스턴스가 진짜 필요한 시점까지 지연(lazy) 처리한다는 것이다.
+  * 3) 애노테이션 설정만으로도 원본 객체를 프록시 객체로 대체할 수 있다. 이것이 바로 다형성과 DI 컨테이너가 가진 강력한 강점이다.
+  * 4) 프록시는 웹 스코프가 아니어도 여러 상황에서 유용하게 사용할 수 있다.
+  *
+  * 반면에, 프록시 객체를 사용할 때 주의점도 존재한다.
+  * 1) 마치 싱글톤 스코프처럼 동작하는 것처럼 보일 뿐, 실제 동작 방식은 싱글톤이 아니므로 복잡한 로직과 사용시 주의해야 한다.
+  * 2) 이런 특별한 Scope 는 꼭 필요한 곳에서 최소화하여 사용해야 한다.
   *
   *
   *
