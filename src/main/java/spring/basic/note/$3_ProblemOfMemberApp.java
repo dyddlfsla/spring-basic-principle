@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class $3_MemberOrderApp {
+public class $3_ProblemOfMemberApp {
 
   /*
  self-taught

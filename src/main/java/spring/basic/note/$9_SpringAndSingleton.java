@@ -1,6 +1,6 @@
 package spring.basic.note;
 
-public class $9_ApplicationAndSingleton {
+public class $9_SpringAndSingleton {
 
   /*
  self-taught
