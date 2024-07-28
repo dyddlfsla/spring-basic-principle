@@ -11,9 +11,9 @@ public class OrderApp {
 
   public static void main(String[] args) {
 
-//    AppConfig appConfig = new AppConfig();
-//    MemberService memberService = appConfig.memberService();
-//    OrderService orderService = appConfig.orderService();
+    // AppConfig appConfig = new AppConfig();
+    // MemberService memberService = appConfig.memberService();
+    // OrderService orderService = appConfig.orderService();
 
     ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
     MemberService memberService = ac.getBean("memberService", MemberService.class);
@@ -26,7 +26,6 @@ public class OrderApp {
     Order order = orderService.createOrder(memberId, "itemA", 20000);
 
     System.out.println("order = " + order);
-
 
   }
 

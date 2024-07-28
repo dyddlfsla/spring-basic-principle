@@ -11,13 +11,14 @@ import spring.basic.member.MemoryMemberRepository;
 import spring.basic.order.OrderService;
 import spring.basic.order.OrderServiceImpl;
 
-/*
- self-taught
-* ◆ AppConfig 의 등장
-* 코드로 돌아가, 애플리케이션의 전체 동작 방식을 구성(config) 하기 위해, 구현 객체를 생성하고
-* 연결해주는 별도의 설정 클래스를 만들자.
-*
-* */
+  /*
+
+  ◆ AppConfig 클래스의 등장.
+  코드로 돌아가, 애플리케이션의 전체 동작 방식을 구성(config) 하기 위해, 구현 객체를 생성하고
+  연결해주는 별도의 설정 클래스를 만들자.
+
+  */
+
 @Configuration
 public class AppConfig {
 
@@ -44,6 +45,5 @@ public class AppConfig {
 //    return new RateDiscountPolicy();
     return new FixDiscountPolicy();
   }
-
 
 }
